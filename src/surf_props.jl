@@ -112,5 +112,5 @@ function surf_props(ebm::EBM, Sf)
         Ts1 = ebm.Tsnow[1]
     end
 
-    return rfs, fsnow
+    return rfs, fsnow, z0
 end

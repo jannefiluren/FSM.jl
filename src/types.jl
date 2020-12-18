@@ -6,6 +6,9 @@ mutable struct EBM
     dt                  # Time step (s)
     Dzsnow              # Minimum snow layer thicknesses (m)
     Dzsoil              # Soil layer thicknesses (m)
+    zT                  # Temperature measurement height (m)
+    zU                  # Wind measurement height (m)
+    zvar                # Subtract snow depth from measurement height
 
 
     # State variables
@@ -73,6 +76,9 @@ mutable struct EBM
         dt = 3600.0
         Dzsnow = [0.1, 0.2, 0.4]
         Dzsoil = [0.1, 0.2, 0.4, 0.8]
+        zT = 2
+        zU = 10
+        zvar = true
 
         #= albs = 0.0
         Ds = fill(0.0, Nsmax)
@@ -136,6 +142,9 @@ mutable struct EBM
             dt,
             Dzsnow,
             Dzsoil,
+            zT,
+            zU,
+            zvar,
             albs,
             Ds,
             Nsnow,
