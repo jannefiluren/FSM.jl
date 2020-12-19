@@ -1,73 +1,73 @@
 mutable struct EBM
 
     # Settings
-    Nsmax               # Maximum number of snow layers
-    Nsoil               # Number of soil layers
-    dt                  # Time step (s)
-    Dzsnow              # Minimum snow layer thicknesses (m)
-    Dzsoil              # Soil layer thicknesses (m)
-    zT                  # Temperature measurement height (m)
-    zU                  # Wind measurement height (m)
-    zvar                # Subtract snow depth from measurement height
+    Nsmax::Int               # Maximum number of snow layers
+    Nsoil::Int               # Number of soil layers
+    dt::Float32                  # Time step (s)
+    Dzsnow::Vector{Float32}              # Minimum snow layer thicknesses (m)
+    Dzsoil::Vector{Float32}              # Soil layer thicknesses (m)
+    zT::Float32                  # Temperature measurement height (m)
+    zU::Float32                  # Wind measurement height (m)
+    zvar::Bool                # Subtract snow depth from measurement height
 
 
     # State variables
-    albs                # Snow albedo
-    Ds                  # Snow layer thicknesses (m)
-    Nsnow               # Number of snow layers
-    Sice                # Ice content of snow layers (kg/m^2)
-    Sliq                # Liquid content of snow layers (kg/m^2)
-    theta               # Volumetric moisture content of soil layers
-    Tsnow               # Snow layer temperatures (K)
-    Tsoil               # Soil layer temperatures (K)
-    Tsurf               # Surface skin temperature (K)
+    albs::Float32                # Snow albedo
+    Ds::Vector{Float32}                  # Snow layer thicknesses (m)
+    Nsnow::Int               # Number of snow layers
+    Sice::Vector{Float32}                # Ice content of snow layers (kg/m^2)
+    Sliq::Vector{Float32}                # Liquid content of snow layers (kg/m^2)
+    theta::Vector{Float32}               # Volumetric moisture content of soil layers
+    Tsnow::Vector{Float32}               # Snow layer temperatures (K)
+    Tsoil::Vector{Float32}               # Soil layer temperatures (K)
+    Tsurf::Float32               # Surface skin temperature (K)
 
     # Snow parameters
-    asmx                # Maximum albedo for fresh snow
-    asmn                # Minimum albedo for melting snow
-    bstb                # Stability slope parameter
-    bthr                # Snow thermal conductivity exponent
-    hfsn                # Snow cover fraction depth scale (m)
-    kfix                # Fixed thermal conductivity of snow (W/m/K)
-    rho0                # Fixed snow density (kg/m^3)
-    rhof                # Fresh snow density (kg/m^3)
-    rcld                # Maximum density for cold snow (kg/m^3)
-    rmlt                # Maximum density for melting snow (kg/m^3)
-    Salb                # Snowfall to refresh albedo (kg/m^2)
-    Talb                # Albedo decay temperature threshold (C)
-    tcld                # Cold snow albedo decay timescale (h)
-    tmlt                # Melting snow albedo decay timescale (h)
-    trho                # Snow compaction time scale (h)
-    Wirr                # Irreducible liquid water content of snow
-    z0sn                # Snow roughness length (m)
+    asmx::Float32                # Maximum albedo for fresh snow
+    asmn::Float32                # Minimum albedo for melting snow
+    bstb::Float32                # Stability slope parameter
+    bthr::Float32                # Snow thermal conductivity exponent
+    hfsn::Float32                # Snow cover fraction depth scale (m)
+    kfix::Float32                # Fixed thermal conductivity of snow (W/m/K)
+    rho0::Float32                # Fixed snow density (kg/m^3)
+    rhof::Float32                # Fresh snow density (kg/m^3)
+    rcld::Float32                # Maximum density for cold snow (kg/m^3)
+    rmlt::Float32                # Maximum density for melting snow (kg/m^3)
+    Salb::Float32                # Snowfall to refresh albedo (kg/m^2)
+    Talb::Float32                # Albedo decay temperature threshold (C)
+    tcld::Float32                # Cold snow albedo decay timescale (h)
+    tmlt::Float32                # Melting snow albedo decay timescale (h)
+    trho::Float32                # Snow compaction time scale (h)
+    Wirr::Float32                # Irreducible liquid water content of snow
+    z0sn::Float32                # Snow roughness length (m)
 
     # Surface parameters
-    alb0                # Snow-free ground albedo
-    gsat                # Surface conductance for saturated soil (m/s)
-    z0sf                # Snow-free roughness length (m)
+    alb0::Float32                # Snow-free ground albedo
+    gsat::Float32                # Surface conductance for saturated soil (m/s)
+    z0sf::Float32                # Snow-free roughness length (m)
 
     # Soil properties
-    b                   # Clapp-Hornberger exponent
-    fcly                # Soil clay fraction
-    fsnd                # Soil sand fraction
-    hcap_soil           # Volumetric heat capacity of dry soil (J/K/m^3)
-    hcon_soil           # Thermal conductivity of dry soil (W/m/K)
-    sathh               # Saturated soil water pressure (m)
-    Vcrit               # Volumetric soil moisture concentration at critical point
-    Vsat                # Volumetric soil moisture concentration at saturation
+    b::Float32                   # Clapp-Hornberger exponent
+    fcly::Float32                # Soil clay fraction
+    fsnd::Float32                # Soil sand fraction
+    hcap_soil::Float32           # Volumetric heat capacity of dry soil (J/K/m^3)
+    hcon_soil::Float32           # Thermal conductivity of dry soil (W/m/K)
+    sathh::Float32               # Saturated soil water pressure (m)
+    Vcrit::Float32               # Volumetric soil moisture concentration at critical point
+    Vsat::Float32               # Volumetric soil moisture concentration at saturation
 
     # Configurations
-    am                  # Snow albedo model
-    cm                  # Snow conductivity model
-    dm                  # Snow density model
-    em                  # Surface exchange model
-    hm                  # Snow hydraulics model
+    am::Int                  # Snow albedo model
+    cm::Int                  # Snow conductivity model
+    dm::Int                  # Snow density model
+    em::Int                  # Surface exchange model
+    hm::Int                  # Snow hydraulics model
 
     # Other stuff
 
-    ksnow
-    ksoil
-    csoil
+    ksnow::Vector{Float32}
+    ksoil::Vector{Float32}
+    csoil::Vector{Float32}
 
     function EBM(albs, Ds, Nsnow, Sice, Sliq, theta, Tsnow, Tsoil, Tsurf)
 

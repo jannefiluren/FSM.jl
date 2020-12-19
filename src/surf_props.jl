@@ -1,10 +1,6 @@
 function surf_props(ebm::EBM, Sf)
 
-    #= ebm.ksnow = zeros(ebm.Nsmax) # TODO: Fix later if possible...
-    ebm.csoil = zeros(ebm.Nsoil) # TODO: Fix later if possible...
-    ebm.ksoil = zeros(ebm.Nsoil) # TODO: Fix later if possible... =#
-
-    gs = 0  # TODO: Fix later if possible...
+    gs = 0  # TODO: Fix later if possible... perhaps remove from here...
 
     # Snow albedo
 
@@ -112,5 +108,5 @@ function surf_props(ebm::EBM, Sf)
         Ts1 = ebm.Tsnow[1]
     end
 
-    return rfs, fsnow, z0
+    return rfs, fsnow, z0, gs, ksurf, Ts1, Dz1, alb
 end
