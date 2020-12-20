@@ -14,9 +14,9 @@ Tsurf = 275.0
 
 ebm = EBM(albs, Ds, Nsnow, Sice, Sliq, theta, Tsnow, Tsoil, Tsurf)
 
-rfs, fsnow, gs, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet = run!(ebm)
+rfs, fsnow, gs, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE = run!(ebm)
 
-@testset "FSM.jl" begin
+@testset "surf_props" begin
 
     @test ebm.albs ≈ 0.799584329 atol = 0.01
     @test rfs ≈ 100.000000 atol = 0.01
@@ -24,11 +24,6 @@ rfs, fsnow, gs, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet = run!(ebm)
     @test fsnow ≈ 0.999329329 atol = 0.01
     @test ebm.ksoil ≈ [0.617699385, 0.617699385, 0.617699385, 0.617699385] atol = 0.01
     @test ebm.csoil ≈ [313533.375, 627066.750, 1254133.50, 2508267.00] atol = 1
-
-end
-
-@testset "surf_props" begin
-
     @test gs ≈ 9.99999978E-03 atol = 0.01
 
 end
@@ -36,17 +31,30 @@ end
 @testset "surf_exch" begin
 
     @test z0 ≈ 1.00154541E-02 atol = 0.01
-    @test CH ≈ 1.86191276E-02 atol = 0.00001
+    @test CH ≈ 8.34332866E-07 atol = 0.00001
 
 end
 
 @testset "surf_ebal" begin
 
-    @test Esnow ≈ 4.57266378E-06 atol = 0.0001
-    @test Gsurf ≈ -0.566179335 atol = 0.0001
-    @test Hsurf ≈ -21.4068260 atol = 0.0001
-    @test LEsrf ≈ 12.9635019 atol = 0.0001
+    @test Esnow ≈ -1.11710710E-10 atol = 0.0001
+    @test Gsurf ≈ -1.64053345 atol = 0.0001
+    @test Hsurf ≈ -2.08867830E-03 atol = 0.0001
+    @test LEsrf ≈ -3.16699850E-04 atol = 0.0001
     @test Melt ≈ 0.00000000 atol = 0.0001
-    @test Rnet ≈ -20.8406448 atol = 0.0001
+    @test Rnet ≈ -1.64294291 atol = 0.0001
 
+end
+
+@testset "snow" begin
+
+    @test ebm.Sliq ≈ [0.00000000, 0.00000000, 9.68967229E-02] atol = 0.0001
+    @test ebm.Sice ≈ [10.0120592, 20.0241184, 113.866928] atol = 0.0001
+    @test snowdepth ≈ 1.11644852 atol = 0.01  # not very exact...
+    @test SWE ≈ 144.000000 atol = 0.001
+
+end
+
+@testset "soil" begin
+    @test ebm.Tsoil ≈ [281.988373, 283.954071, 283.999725, 284.000000] atol = 0.0001
 end

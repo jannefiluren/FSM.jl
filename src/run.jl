@@ -1,5 +1,8 @@
 function run!(ebm::EBM)
 
+    local Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet
+    local CH
+
     year = 2005
     month = 10
     day = 1
@@ -20,14 +23,15 @@ function run!(ebm::EBM)
 
     rfs, fsnow, z0, gs, ksurf, Ts1, Dz1, alb = surf_props(ebm, Sf)
 
-    # for i in 1:6
-    CH, z0 = surf_exch(ebm, Ta, Ua, z0)
-    Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet = surf_ebal(ebm, CH, gs, ksurf, Ts1, Dz1, alb, Ta, Qa, Ua, Ps, SW, LW)
+    for i in 1:6
+        CH, z0 = surf_exch(ebm, Ta, Ua, z0)
+        Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet = surf_ebal(ebm, CH, gs, ksurf, Ts1, Dz1, alb, Ta, Qa, Ua, Ps, SW, LW)
+    end
 
-    # end
+    snowdepth, SWE, Gsoil = snow(ebm, Sf, Rf, rfs, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
 
+    soil(ebm, Gsoil)
 
-
-    return rfs, fsnow, gs, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet
+    return rfs, fsnow, gs, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE
 
 end
