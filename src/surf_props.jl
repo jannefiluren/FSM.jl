@@ -34,6 +34,7 @@ function surf_props(ebm::EBM, Sf)
 
     # Thermal conductivity of snow
 
+    ebm.ksnow[:] .= ebm.kfix
     if (ebm.cm == 0) # Fixed
         ebm.ksnow[:] .= ebm.kfix
     elseif (ebm.cm == 1)  # Density function
@@ -97,7 +98,12 @@ function surf_props(ebm::EBM, Sf)
     # Surface layer
 
     Dz1 = max(ebm.Dzsoil[1], ebm.Ds[1])
+
+
+    @bp
     Ts1 = ebm.Tsoil[1] + (ebm.Tsnow[1] - ebm.Tsoil[1]) * ebm.Ds[1] / ebm.Dzsoil[1]
+
+
     ksurf = ebm.Dzsoil[1] / (2 * ebm.Ds[1] / ebm.ksnow[1] + (ebm.Dzsoil[1] - 2 * ebm.Ds[1]) / ebm.ksoil[1])
 
     if (ebm.Ds[1] > 0.5 * ebm.Dzsoil[1])

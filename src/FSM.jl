@@ -1,5 +1,7 @@
 module FSM
 
+using Debugger
+
 include("constants.jl")
 include("types.jl")
 include("run.jl")
@@ -11,6 +13,6 @@ include("surf_ebal.jl")
 include("snow.jl")
 include("soil.jl")
 
-export EBM, run!
+export EBM, Input, run!
 
 end

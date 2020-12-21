@@ -1,4 +1,4 @@
-function snow(ebm::EBM, Sf, Rf, rfs, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
+function snow(ebm::EBM, Sf, Rf, Ta, rfs, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
 
     Gsoil = Gsurf
     Roff = Rf * ebm.dt

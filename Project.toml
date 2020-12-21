@@ -3,6 +3,11 @@ uuid = "5f4fc399-9581-4006-a2d5-a6e0278e1921"
 authors = ["jmg <jmg@nve.no> and contributors"]
 version = "0.1.0"
 
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Debugger = "31a5f54b-26ea-5ae9-a837-f05ce5417438"
+
 [compat]
 julia = "1"
 

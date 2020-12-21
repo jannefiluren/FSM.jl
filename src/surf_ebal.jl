@@ -18,12 +18,6 @@ function surf_ebal(ebm::EBM, CH, gs, ksurf, Ts1, Dz1, alb, Ta, Qa, Ua, Ps, SW, L
     Esurf = psi * rKH * (Qs - Qa)
     Gsurf = 2 * ksurf * (ebm.Tsurf - Ts1) / Dz1
 
-    @info cp
-    @info rKH
-    @info ebm.Tsurf
-    @info Ta
-
-
     Hsurf = cp * rKH * (ebm.Tsurf - Ta)
     LEsrf = Lh * Esurf
     Melt = 0

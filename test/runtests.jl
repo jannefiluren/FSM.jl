@@ -14,7 +14,23 @@ Tsurf = 275.0
 
 ebm = EBM(albs, Ds, Nsnow, Sice, Sliq, theta, Tsnow, Tsoil, Tsurf)
 
-rfs, fsnow, gs, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE = run!(ebm)
+input = Input(
+    [2005],
+    [10],
+    [1],
+    [0],
+    [0.0],
+    [300.0],
+    [0.02],
+    [0.000],
+    [273.8],
+    [78.2],
+    [0.6],
+    [87480.]
+)
+
+
+rfs, fsnow, gs, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE, SWEall = run!(ebm, input)
 
 @testset "surf_props" begin
 

@@ -1,3 +1,19 @@
+struct Input
+    year::Vector{Int}
+    month::Vector{Int}
+    day::Vector{Int}
+    hour::Vector{Int}
+    SW::Vector{Float32}
+    LW::Vector{Float32}
+    Sf::Vector{Float32}
+    Rf::Vector{Float32}
+    Ta::Vector{Float32}
+    RH::Vector{Float32}
+    Ua::Vector{Float32}
+    Ps::Vector{Float32}
+end
+
+
 mutable struct EBM
 
     # Settings
