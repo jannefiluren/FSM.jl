@@ -30,7 +30,7 @@ function surf_ebal(ebm::EBM, CH, gs, ksurf, Ts1, Dz1, alb, Ta, Qa, Ua, Ps, SW, L
 
     # Surface melting
     if (ebm.Tsurf + dTs > Tm && ebm.Sice[1] > 0)
-        Melt = sum(ebm.Sice) / dt
+        Melt = sum(ebm.Sice) / ebm.dt
         dTs = (Rnet - Hsurf - LEsrf - Gsurf - Lf * Melt) / ((cp + Ls * psi * D) * rKH + 2 * ksurf / Dz1 + 4 * sb * ebm.Tsurf^3)
         dE = rKH * D * dTs
         dG = 2 * ksurf * dTs / Dz1

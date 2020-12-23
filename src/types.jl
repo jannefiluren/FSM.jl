@@ -147,11 +147,11 @@ mutable struct EBM
         ksoil = fill(0.0, Nsoil)
         csoil = fill(0.0, Nsoil)
 
-        am = 1
-        cm = 1
-        dm = 1
-        em = 1
-        hm = 1
+        am = 0
+        cm = 0
+        dm = 0
+        em = 0
+        hm = 0
 
         new(Nsmax,
             Nsoil,

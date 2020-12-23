@@ -3,7 +3,7 @@ using CSV
 using DataFrames
 using Debugger
 
-data = CSV.File("data/met_CdP_0506 copy.txt", header=["year", "month", "day", "hour", "SW", "LW", "Sf", "Rf", "Ta", "RH", "Ua", "Ps"], delim=" ", ignorerepeated=true) |> DataFrame
+data = CSV.File("data/met_CdP_0506.txt", header=["year", "month", "day", "hour", "SW", "LW", "Sf", "Rf", "Ta", "RH", "Ua", "Ps"], delim=" ", ignorerepeated=true) |> DataFrame
 
 input = Input(
     data.year,
@@ -32,5 +32,5 @@ Tsurf = 275.0
 
 ebm = EBM(albs, Ds, Nsnow, Sice, Sliq, theta, Tsnow, Tsoil, Tsurf)
 
-swe = run!(ebm, input)
+rfs, fsnow, gs, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE, SWEall = run!(ebm, input)
 # @run run!(ebm, input)

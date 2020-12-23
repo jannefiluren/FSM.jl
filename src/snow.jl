@@ -110,7 +110,7 @@ function snow(ebm::EBM, Sf, Rf, Ta, rfs, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
             for k = 1:ebm.Nsnow
                 # global Roff ### hack
                 phi = 0
-                if (ebm.Ds[k] > eps(Float64))
+                if (ebm.Ds[k] > eps(first(ebm.Ds)))
                     phi = 1 - ebm.Sice[k] / (rho_ice * ebm.Ds[k])
                 end
                 SliqMax = rho_wat * ebm.Ds[k] * phi * ebm.Wirr

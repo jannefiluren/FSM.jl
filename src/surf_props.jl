@@ -40,7 +40,7 @@ function surf_props(ebm::EBM, Sf)
     elseif (ebm.cm == 1)  # Density function
         for k in 1:ebm.Nsnow
             rhos = rfs
-            if (ebm.dm == 1 && ebm.Ds[k] > eps(Float64))
+            if (ebm.dm == 1 && ebm.Ds[k] > eps(first(ebm.Ds)))
                 rhos = (ebm.Sice[k] + ebm.Sliq[k]) / ebm.Ds[k]
             end
             ebm.ksnow[k] = hcon_ice * (rhos / rho_ice)^ebm.bthr
@@ -61,15 +61,15 @@ function surf_props(ebm::EBM, Sf)
     for k in 1:ebm.Nsoil
         ebm.csoil[k] = ebm.hcap_soil * ebm.Dzsoil[k]
         ebm.ksoil[k] = ebm.hcon_soil
-        if (ebm.theta[k] > eps(Float64))
+        if (ebm.theta[k] > eps(first(ebm.theta)))
             dthudT = 0
             sthu = ebm.theta[k]
             sthf = 0
             Tc = ebm.Tsoil[k] - Tm
             Tmax = Tm + (ebm.sathh / dPsidT) * (ebm.Vsat / ebm.theta[k])^ebm.b
             if (ebm.Tsoil[k] < Tmax)
-                dthudT = (-dPsidT * ebm.Vsat / (ebm.b * ebm.sathh)) * (dPsidT * Tc / ebm.sathh)^(-1 / b - 1)
-                sthu = ebm.Vsat * (dPsidT * Tc / ebm.sathh)^(-1 / b)
+                dthudT = (-dPsidT * ebm.Vsat / (ebm.b * ebm.sathh)) * (dPsidT * Tc / ebm.sathh)^(-1 / ebm.b - 1)
+                sthu = ebm.Vsat * (dPsidT * Tc / ebm.sathh)^(-1 / ebm.b)
                 sthu = min(sthu, ebm.theta[k])
                 sthf = (ebm.theta[k] - sthu) * rho_wat / rho_ice
             end
@@ -80,7 +80,7 @@ function surf_props(ebm::EBM, Sf)
             Smu = sthu / ebm.Vsat
             thice = 0
             if (Smf > 0)
-                thice = Vsat * Smf / (Smu + Smf)
+                thice = ebm.Vsat * Smf / (Smu + Smf)
             end
             thwat = 0
             if (Smu > 0)
@@ -99,10 +99,7 @@ function surf_props(ebm::EBM, Sf)
 
     Dz1 = max(ebm.Dzsoil[1], ebm.Ds[1])
 
-
-    @bp
     Ts1 = ebm.Tsoil[1] + (ebm.Tsnow[1] - ebm.Tsoil[1]) * ebm.Ds[1] / ebm.Dzsoil[1]
-
 
     ksurf = ebm.Dzsoil[1] / (2 * ebm.Ds[1] / ebm.ksnow[1] + (ebm.Dzsoil[1] - 2 * ebm.Ds[1]) / ebm.ksoil[1])
 
