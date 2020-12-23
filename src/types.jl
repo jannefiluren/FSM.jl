@@ -14,198 +14,174 @@ struct Input
 end
 
 
-mutable struct EBM
+Base.@kwdef mutable struct EBM
 
-    # Settings
-    Nsmax::Int               # Maximum number of snow layers
-    Nsoil::Int               # Number of soil layers
-    dt::Float32                  # Time step (s)
-    Dzsnow::Vector{Float32}              # Minimum snow layer thicknesses (m)
-    Dzsoil::Vector{Float32}              # Soil layer thicknesses (m)
-    zT::Float32                  # Temperature measurement height (m)
-    zU::Float32                  # Wind measurement height (m)
-    zvar::Bool                # Subtract snow depth from measurement height
+    ### Settings #################################################
 
+    # Maximum number of snow layers
+    Nsmax::Int = 3
 
-    # State variables
-    albs::Float32                # Snow albedo
-    Ds::Vector{Float32}                  # Snow layer thicknesses (m)
-    Nsnow::Int               # Number of snow layers
-    Sice::Vector{Float32}                # Ice content of snow layers (kg/m^2)
-    Sliq::Vector{Float32}                # Liquid content of snow layers (kg/m^2)
-    theta::Vector{Float32}               # Volumetric moisture content of soil layers
-    Tsnow::Vector{Float32}               # Snow layer temperatures (K)
-    Tsoil::Vector{Float32}               # Soil layer temperatures (K)
-    Tsurf::Float32               # Surface skin temperature (K)
+    # Number of soil layers
+    Nsoil::Int = 4
 
-    # Snow parameters
-    asmx::Float32                # Maximum albedo for fresh snow
-    asmn::Float32                # Minimum albedo for melting snow
-    bstb::Float32                # Stability slope parameter
-    bthr::Float32                # Snow thermal conductivity exponent
-    hfsn::Float32                # Snow cover fraction depth scale (m)
-    kfix::Float32                # Fixed thermal conductivity of snow (W/m/K)
-    rho0::Float32                # Fixed snow density (kg/m^3)
-    rhof::Float32                # Fresh snow density (kg/m^3)
-    rcld::Float32                # Maximum density for cold snow (kg/m^3)
-    rmlt::Float32                # Maximum density for melting snow (kg/m^3)
-    Salb::Float32                # Snowfall to refresh albedo (kg/m^2)
-    Talb::Float32                # Albedo decay temperature threshold (C)
-    tcld::Float32                # Cold snow albedo decay timescale (h)
-    tmlt::Float32                # Melting snow albedo decay timescale (h)
-    trho::Float32                # Snow compaction time scale (h)
-    Wirr::Float32                # Irreducible liquid water content of snow
-    z0sn::Float32                # Snow roughness length (m)
+    # Time step (s)
+    dt::Float32 = 3600
 
-    # Surface parameters
-    alb0::Float32                # Snow-free ground albedo
-    gsat::Float32                # Surface conductance for saturated soil (m/s)
-    z0sf::Float32                # Snow-free roughness length (m)
+    # Minimum snow layer thicknesses (m)
+    Dzsnow::Vector{Float32} = [0.1, 0.2, 0.4]
 
-    # Soil properties
-    b::Float32                   # Clapp-Hornberger exponent
-    fcly::Float32                # Soil clay fraction
-    fsnd::Float32                # Soil sand fraction
-    hcap_soil::Float32           # Volumetric heat capacity of dry soil (J/K/m^3)
-    hcon_soil::Float32           # Thermal conductivity of dry soil (W/m/K)
-    sathh::Float32               # Saturated soil water pressure (m)
-    Vcrit::Float32               # Volumetric soil moisture concentration at critical point
-    Vsat::Float32               # Volumetric soil moisture concentration at saturation
+    # Soil layer thicknesses (m)
+    Dzsoil::Vector{Float32} = [0.1, 0.2, 0.4, 0.8]
 
-    # Configurations
-    am::Int                  # Snow albedo model
-    cm::Int                  # Snow conductivity model
-    dm::Int                  # Snow density model
-    em::Int                  # Surface exchange model
-    hm::Int                  # Snow hydraulics model
+    # Temperature measurement height (m)
+    zT::Float32 = 2
 
-    # Other stuff
+    # Wind measurement height (m)
+    zU::Float32 = 10
 
-    ksnow::Vector{Float32}
-    ksoil::Vector{Float32}
-    csoil::Vector{Float32}
+    # Subtract snow depth from measurement height
+    zvar::Bool = true
 
-    function EBM(albs, Ds, Nsnow, Sice, Sliq, theta, Tsnow, Tsoil, Tsurf)
+    ### Snow parameters #################################################
 
-        Nsmax = 3
-        Nsoil = 4
-        dt = 3600.0
-        Dzsnow = [0.1, 0.2, 0.4]
-        Dzsoil = [0.1, 0.2, 0.4, 0.8]
-        zT = 2
-        zU = 10
-        zvar = true
+    # Maximum albedo for fresh snow
+    asmx::Float32 = 0.8
 
-        #= albs = 0.0
-        Ds = fill(0.0, Nsmax)
-        Nsnow = 0
-        Sice = fill(0.0, Nsmax)
-        Sliq = fill(0.0, Nsmax)
-        theta = fill(0.0, Nsoil)
-        Tsnow = fill(273.15, Nsmax)
-        Tsoil = fill(273.15, Nsmax)
-        Tsurf = 273.15 =#
+    # Minimum albedo for melting snow
+    asmn::Float32 = 0.5
 
-        asmx = 0.8
-        asmn = 0.5
-        bstb = 5
-        bthr = 2
-        hfsn = 0.1
-        kfix = 0.24
-        rho0 = 300
-        rhof = 100
-        rcld = 300
-        rmlt = 500
-        Salb = 10
-        Talb = -2
-        tcld = 1000
-        tmlt = 100
-        trho = 200
-        Wirr = 0.03
-        z0sn = 0.01
+    # Stability slope parameter
+    bstb::Float32 = 5
 
-        alb0 = 0.2
-        gsat = 0.01
-        z0sf = 0.1
+    # Snow thermal conductivity exponent
+    bthr::Float32 = 2
 
-        fcly = 0.3
-        fsnd = 0.6
+    # Snow cover fraction depth scale (m)
+    hfsn::Float32 = 0.1
 
-        if (fcly + fsnd > 1)
-            fcly = 1 - fsnd
-        end
+    # Fixed thermal conductivity of snow (W/m/K)
+    kfix::Float32 = 0.24
 
-        b = 3.1 + 15.7 * fcly - 0.3 * fsnd
-        hcap_soil = (2.128 * fcly + 2.385 * fsnd) * 1E6 / (fcly + fsnd)
-        sathh = 10^(0.17 - 0.63 * fcly - 1.58 * fsnd)
-        Vsat = 0.505 - 0.037 * fcly - 0.142 * fsnd
-        Vcrit = Vsat * (sathh / 3.364)^(1 / b)
-        hcon_min = (hcon_clay^fcly) * (hcon_sand^(1 - fcly))
-        hcon_soil = (hcon_air^Vsat) * (hcon_min^(1 - Vsat))
+    # Fixed snow density (kg/m^3)
+    rho0::Float32 = 300
 
-        ksnow = fill(0.0, Nsmax)
-        ksoil = fill(0.0, Nsoil)
-        csoil = fill(0.0, Nsoil)
+    # Fresh snow density (kg/m^3)
+    rhof::Float32 = 100
 
-        am = 0
-        cm = 0
-        dm = 0
-        em = 0
-        hm = 0
+    # Maximum density for cold snow (kg/m^3)
+    rcld::Float32 = 300
 
-        new(Nsmax,
-            Nsoil,
-            dt,
-            Dzsnow,
-            Dzsoil,
-            zT,
-            zU,
-            zvar,
-            albs,
-            Ds,
-            Nsnow,
-            Sice,
-            Sliq,
-            theta,
-            Tsnow,
-            Tsoil,
-            Tsurf,
-            asmx,
-            asmn,
-            bstb,
-            bthr,
-            hfsn,
-            kfix,
-            rho0,
-            rhof,
-            rcld,
-            rmlt,
-            Salb,
-            Talb,
-            tcld,
-            tmlt,
-            trho,
-            Wirr,
-            z0sn,
-            alb0,
-            gsat,
-            z0sf,
-            b,
-            fcly,
-            fsnd,
-            hcap_soil,
-            hcon_soil,
-            sathh,
-            Vcrit,
-            Vsat,
-            am,
-            cm,
-            dm,
-            em,
-            hm,
-            ksnow,
-            ksoil,
-            csoil)
-    end
+    # Maximum density for melting snow (kg/m^3)
+    rmlt::Float32 = 500
+
+    # Snowfall to refresh albedo (kg/m^2)
+    Salb::Float32 = 10
+
+    # Albedo decay temperature threshold (C)
+    Talb::Float32 = -2
+
+    # Cold snow albedo decay timescale (h)
+    tcld::Float32 = 1000
+
+    # Melting snow albedo decay timescale (h)
+    tmlt::Float32 = 100
+
+    # Snow compaction time scale (h)
+    trho::Float32 = 200
+
+    # Irreducible liquid water content of snow
+    Wirr::Float32 = 0.03
+
+    # Snow roughness length (m)
+    z0sn::Float32 = 0.01
+
+    ### Surface parameters #################################################
+
+    # Snow-free ground albedo
+    alb0::Float32 = 0.2
+
+    # Surface conductance for saturated soil (m/s)
+    gsat::Float32 = 0.01
+
+    # Snow-free roughness length (m)
+    z0sf::Float32 = 0.1
+
+    ### Soil properties #################################################
+
+    # Soil clay fraction
+    fcly::Float32 = 0.3
+
+    # Soil sand fraction
+    fsnd::Float32 = 0.6
+
+    # Clapp-Hornberger exponent
+    b::Float32 = 7.630000000000001
+
+    # Volumetric heat capacity of dry soil (J/K/m^3)
+    hcap_soil::Float32 = 2.2993333333333335e6
+
+    # Saturated soil water pressure (m)
+    sathh::Float32 = 0.10789467222298288
+
+    # Volumetric soil moisture concentration at saturation
+    Vsat::Float32 = 0.4087
+
+    # Volumetric soil moisture concentration at critical point
+    Vcrit::Float32 = 0.2603859120641063
+
+    # Thermal conductivity of dry soil (W/m/K)
+    hcon_soil::Float32 = 0.2740041303112452
+
+    ### State variables #################################################
+
+    # Snow albedo
+    albs::Float32 = 0.8
+
+    # Snow layer thicknesses (m)
+    Ds::Vector{Float32} = fill(0, Nsmax)
+
+    # Number of snow layers
+    Nsnow::Int = 0
+
+    # Ice content of snow layers (kg/m^2)
+    Sice::Vector{Float32} = fill(0, Nsmax)
+
+    # Liquid content of snow layers (kg/m^2)
+    Sliq::Vector{Float32} = fill(0, Nsmax)
+
+    # Volumetric moisture content of soil layers
+    theta::Vector{Float32} = fill(0.5 * Vsat, Nsoil)
+
+    # Snow layer temperatures (K)
+    Tsnow::Vector{Float32} = fill(273.15, Nsmax)
+
+    # Soil layer temperatures (K)
+    Tsoil::Vector{Float32} = fill(285, Nsoil)
+
+    # Surface skin temperature (K)
+    Tsurf::Float32 = Tsoil[1]
+
+    ### Configurations #################################################
+
+    # Snow albedo model
+    am::Int = 0
+
+    # Snow conductivity model
+    cm::Int = 0
+
+    # Snow density model
+    dm::Int = 0
+
+    # Surface exchange model
+    em::Int = 0
+
+    # Snow hydraulics model
+    hm::Int = 0
+
+    ### Other stuff #################################################
+
+    ksnow::Vector{Float32} = fill(0, Nsmax)
+    ksoil::Vector{Float32} = fill(0, Nsoil)
+    csoil::Vector{Float32} = fill(0, Nsoil)
 
 end
