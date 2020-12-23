@@ -34,7 +34,7 @@ Tsurf = 275.0
 
 ebm = EBM(albs, Ds, Nsnow, Sice, Sliq, theta, Tsnow, Tsoil, Tsurf) =#
 
-ebm = EBM()
+ebm = EBM{Float32}()
 
 rfs, fsnow, gs, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE, SWEall = run!(ebm, input)
 
@@ -43,5 +43,7 @@ rfs, fsnow, gs, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE, 
     err = SWEall - data_ref.SWE
 
     @test maximum(abs.(err)) < 10
+
+    @info maximum(abs.(err))
 
 end
