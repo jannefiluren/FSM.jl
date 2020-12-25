@@ -1,22 +1,22 @@
-struct Input
+struct Input{T}
     year::Vector{Int}
     month::Vector{Int}
     day::Vector{Int}
     hour::Vector{Int}
-    SW::Vector{Float32}
-    LW::Vector{Float32}
-    Sf::Vector{Float32}
-    Rf::Vector{Float32}
-    Ta::Vector{Float32}
-    RH::Vector{Float32}
-    Ua::Vector{Float32}
-    Ps::Vector{Float32}
+    SW::Vector{T}
+    LW::Vector{T}
+    Sf::Vector{T}
+    Rf::Vector{T}
+    Ta::Vector{T}
+    RH::Vector{T}
+    Ua::Vector{T}
+    Ps::Vector{T}
 end
 
 
 Base.@kwdef mutable struct EBM{T}
 
-    ### Settings #################################################
+    ### Settings ##############################################################
 
     # Maximum number of snow layers
     Nsmax::Int = 3
@@ -42,7 +42,7 @@ Base.@kwdef mutable struct EBM{T}
     # Subtract snow depth from measurement height
     zvar::Bool = true
 
-    ### Snow parameters #################################################
+    ### Snow parameters #######################################################
 
     # Maximum albedo for fresh snow
     asmx::T = 0.8
@@ -95,7 +95,7 @@ Base.@kwdef mutable struct EBM{T}
     # Snow roughness length (m)
     z0sn::T = 0.01
 
-    ### Surface parameters #################################################
+    ### Surface parameters ####################################################
 
     # Snow-free ground albedo
     alb0::T = 0.2
@@ -106,7 +106,7 @@ Base.@kwdef mutable struct EBM{T}
     # Snow-free roughness length (m)
     z0sf::T = 0.1
 
-    ### Soil properties #################################################
+    ### Soil properties #######################################################
 
     # Soil clay fraction
     fcly::T = 0.3
@@ -132,7 +132,7 @@ Base.@kwdef mutable struct EBM{T}
     # Thermal conductivity of dry soil (W/m/K)
     hcon_soil::T = 0.2740041303112452
 
-    ### State variables #################################################
+    ### State variables #######################################################
 
     # Snow albedo
     albs::T = 0.8
@@ -161,7 +161,7 @@ Base.@kwdef mutable struct EBM{T}
     # Surface skin temperature (K)
     Tsurf::T = Tsoil[1]
 
-    ### Configurations #################################################
+    ### Configurations ########################################################
 
     # Snow albedo model
     am::Int = 0
@@ -178,10 +178,18 @@ Base.@kwdef mutable struct EBM{T}
     # Snow hydraulics model
     hm::Int = 0
 
-    ### Other stuff #################################################
+    ### Internal variables ####################################################
 
+    # Thermal conductivity of snow (W/m/K)
     ksnow::Vector{T} = fill(0, Nsmax)
+
+    # Thermal conductivity of soil (W/m/K)
     ksoil::Vector{T} = fill(0, Nsoil)
+
+    # Areal heat capacity of soil (J/K/m^2)
     csoil::Vector{T} = fill(0, Nsoil)
+
+    # Surface moisture conductance (m/s)
+    gs::T = 0
 
 end

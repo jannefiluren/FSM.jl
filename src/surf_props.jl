@@ -1,6 +1,6 @@
 function surf_props(ebm::EBM, Sf)
 
-    gs = 0  # TODO: Fix later if possible... perhaps remove from here...
+    # ebm.gs = 0  # TODO: Fix later if possible... perhaps remove from here...
 
     # Snow albedo
 
@@ -13,7 +13,7 @@ function surf_props(ebm::EBM, Sf)
         end
         rt = 1 / tau + Sf / ebm.Salb
         alim = (ebm.asmn / tau + Sf * ebm.asmx / ebm.Salb) / rt
-        albs = alim + (ebm.albs - alim) * exp(-rt * ebm.dt)
+        ebm.albs = alim + (ebm.albs - alim) * exp(-rt * ebm.dt)
     end
 
     if (ebm.albs < min(ebm.asmx, ebm.asmn))
@@ -89,8 +89,7 @@ function surf_props(ebm::EBM, Sf)
             hcon_sat = ebm.hcon_soil * (hcon_wat^thwat) * (hcon_ice^thice) / (hcon_air^ebm.Vsat)
             ebm.ksoil[k] = (hcon_sat - ebm.hcon_soil) * (Smf + Smu) + ebm.hcon_soil
             if (k == 1)
-                # global gs  # HACKHACK TODO
-                gs = ebm.gsat * max((Smu * ebm.Vsat / ebm.Vcrit)^2, 1.)
+                ebm.gs = ebm.gsat * max((Smu * ebm.Vsat / ebm.Vcrit)^2, 1.)
             end
         end
     end
@@ -111,5 +110,5 @@ function surf_props(ebm::EBM, Sf)
         Ts1 = ebm.Tsnow[1]
     end
 
-    return rfs, fsnow, z0, gs, ksurf, Ts1, Dz1, alb
+    return rfs, fsnow, z0, ksurf, Ts1, Dz1, alb
 end

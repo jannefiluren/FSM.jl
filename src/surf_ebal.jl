@@ -1,8 +1,8 @@
-function surf_ebal(ebm::EBM, CH, gs, ksurf, Ts1, Dz1, alb, Ta, Qa, Ua, Ps, SW, LW)
+function surf_ebal(ebm::EBM, CH, ksurf, Ts1, Dz1, alb, Ta, Qa, Ua, Ps, SW, LW)
 
     Qs = qsat(false, Ps, ebm.Tsurf)
 
-    psi = gs / (gs + CH * Ua)
+    psi = ebm.gs / (ebm.gs + CH * Ua)
     if (Qs < Qa || ebm.Sice[1] > 0)
         psi = 1
     end

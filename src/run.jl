@@ -4,7 +4,7 @@ function run!(ebm::EBM, in::Input)
 
     local Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet
     local CH
-    local rfs, fsnow, gs, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE
+    local rfs, fsnow, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE
 
     for i in 1:length(in.year)
 
@@ -24,14 +24,12 @@ function run!(ebm::EBM, in::Input)
         Qs = qsat(true, Ps, Ta)
         Qa = (RH / 100) * Qs
 
-        @bp
-
-        rfs, fsnow, z0, gs, ksurf, Ts1, Dz1, alb = surf_props(ebm, Sf)
+        rfs, fsnow, z0, ksurf, Ts1, Dz1, alb = surf_props(ebm, Sf)
 
 
         for i in 1:6
             CH, z0 = surf_exch(ebm, Ta, Ua, z0)
-            Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet = surf_ebal(ebm, CH, gs, ksurf, Ts1, Dz1, alb, Ta, Qa, Ua, Ps, SW, LW)
+            Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet = surf_ebal(ebm, CH, ksurf, Ts1, Dz1, alb, Ta, Qa, Ua, Ps, SW, LW)
         end
 
 
@@ -43,6 +41,6 @@ function run!(ebm::EBM, in::Input)
 
     end
 
-    return rfs, fsnow, gs, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE, SWEall
+    return rfs, fsnow, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE, SWEall
 
 end
