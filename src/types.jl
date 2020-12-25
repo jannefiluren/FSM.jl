@@ -216,4 +216,25 @@ Base.@kwdef mutable struct EBM{T}
     # Surface layer thickness (m)
     Dz1::T = 0
 
+    # Snow sublimation rate (kg/m^2/s)
+    Esnow::T = 0
+
+    # Heat flux into surface (W/m^2)
+    Gsurf::T = 0
+
+    # Sensible heat flux (W/m^2)
+    Hsurf::T = 0
+
+    # Latent heat flux (W/m^2)
+    LEsrf::T = 0
+
+    # Surface melt rate (kg/m^2/s)
+    Melt::T = 0
+
+    # Net radiation (W/m^2)
+    Rnet::T = 0
+
+    # Heat flux into soil (W/m^2)
+    Gsoil::T = 0
+
 end

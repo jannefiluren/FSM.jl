@@ -25,7 +25,7 @@ input = Input{Float32}(
 
 ebm = EBM{Float32}(am=0, cm=0, dm=0, em=0, hm=0)  ### TODO: something wrong with em!!!
 
-Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE, SWEall = run!(ebm, input)
+snowdepth, SWE, SWEall = run!(ebm, input)
 
 lineplot(SWEall)
 # @run run!(ebm, input)

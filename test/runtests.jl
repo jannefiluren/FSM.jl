@@ -26,13 +26,13 @@ input = Input{Float32}(
 
 ebm = EBM{Float32}()
 
-Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE, SWEall = run!(ebm, input)
+snowdepth, SWE = run!(ebm, input)
 
 
 
 @testset "complete sim" begin
 
-    err = SWEall - data_ref.SWE
+    err = SWE - data_ref.SWE
 
     @test maximum(abs.(err)) < 10
 

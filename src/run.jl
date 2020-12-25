@@ -1,9 +1,7 @@
 function run!(ebm::EBM, in::Input)
 
-    SWEall = zeros(length(in.Ta))
-
-    local Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet
-    local snowdepth, SWE
+    snowdepth = zeros(length(in.Ta))
+    SWE = zeros(length(in.Ta))
 
     for i in 1:length(in.year)
 
@@ -27,18 +25,15 @@ function run!(ebm::EBM, in::Input)
 
         for i in 1:6
             surf_exch(ebm, Ta, Ua)
-            Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet = surf_ebal(ebm, Ta, Qa, Ua, Ps, SW, LW)
+            surf_ebal(ebm, Ta, Qa, Ua, Ps, SW, LW)
         end
 
+        snowdepth[i], SWE[i] = snow(ebm, Sf, Rf, Ta)
 
-        snowdepth, SWE, Gsoil = snow(ebm, Sf, Rf, Ta, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
-
-        soil(ebm, Gsoil)
-
-        SWEall[i] = SWE
+        soil(ebm)
 
     end
 
-    return Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE, SWEall
+    return snowdepth, SWE
 
 end

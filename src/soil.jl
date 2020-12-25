@@ -1,4 +1,4 @@
-function soil(ebm::EBM, Gsoil)
+function soil(ebm::EBM)
 
     a = zeros(ebm.Nsoil)  ##### hack
     b = zeros(ebm.Nsoil)  ##### hack
@@ -13,7 +13,7 @@ function soil(ebm::EBM, Gsoil)
     a[1] = 0
     b[1] = ebm.csoil[1] + Gs[1] * ebm.dt
     c[1] = - Gs[1] * ebm.dt
-    rhs[1] = (Gsoil - Gs[1] * (ebm.Tsoil[1] - ebm.Tsoil[2])) * ebm.dt
+    rhs[1] = (ebm.Gsoil - Gs[1] * (ebm.Tsoil[1] - ebm.Tsoil[2])) * ebm.dt
     for k = 2:(ebm.Nsoil - 1)
         a[k] = c[k - 1]
         b[k] = ebm.csoil[k] + (Gs[k - 1] + Gs[k]) * ebm.dt

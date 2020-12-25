@@ -1,6 +1,6 @@
-function snow(ebm::EBM, Sf, Rf, Ta, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
+function snow(ebm::EBM, Sf, Rf, Ta)
 
-    Gsoil = Gsurf
+    ebm.Gsoil = ebm.Gsurf
     Roff = Rf * ebm.dt
 
 
@@ -24,7 +24,7 @@ function snow(ebm::EBM, Sf, Rf, Ta, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
         # Heat conduction
         if (ebm.Nsnow == 1)
             Gs[1] = 2 / (ebm.Ds[1] / ebm.ksnow[1] + ebm.Dzsoil[1] / ebm.ksoil[1])
-            dTs[1] = (Gsurf + Gs[1] * (ebm.Tsoil[1] - ebm.Tsnow[1])) * ebm.dt / (csnow[1] + Gs[1] * ebm.dt)
+            dTs[1] = (ebm.Gsurf + Gs[1] * (ebm.Tsoil[1] - ebm.Tsnow[1])) * ebm.dt / (csnow[1] + Gs[1] * ebm.dt)
         else
             for k = 1:(ebm.Nsnow - 1)
                 Gs[k] = 2 / (ebm.Ds[k] / ebm.ksnow[k] + ebm.Ds[k + 1] / ebm.ksnow[k + 1])
@@ -32,7 +32,7 @@ function snow(ebm::EBM, Sf, Rf, Ta, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
             atmp[1] = 0
             btmp[1] = csnow[1] + Gs[1] * ebm.dt
             ctmp[1] = - Gs[1] * ebm.dt
-            rhs[1] = (Gsurf - Gs[1] * (ebm.Tsnow[1] - ebm.Tsnow[2])) * ebm.dt
+            rhs[1] = (ebm.Gsurf - Gs[1] * (ebm.Tsnow[1] - ebm.Tsnow[2])) * ebm.dt
             for k = 2:(ebm.Nsnow - 1)
                 atmp[k] = ctmp[k - 1]
                 btmp[k] = csnow[k] + (Gs[k - 1] + Gs[k]) * ebm.dt
@@ -53,12 +53,12 @@ function snow(ebm::EBM, Sf, Rf, Ta, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
         for k = 1:ebm.Nsnow
             ebm.Tsnow[k] = ebm.Tsnow[k] + dTs[k]
         end
-        Gsoil = Gs[ebm.Nsnow] * (ebm.Tsnow[ebm.Nsnow] - ebm.Tsoil[1])
+        ebm.Gsoil = Gs[ebm.Nsnow] * (ebm.Tsnow[ebm.Nsnow] - ebm.Tsoil[1])
 
 
 
         # Convert melting ice to liquid water
-        dSice = Melt * ebm.dt
+        dSice = ebm.Melt * ebm.dt
         for k = 1:ebm.Nsnow
             coldcont = csnow[k] * (Tm - ebm.Tsnow[k])
             if (coldcont < 0)
@@ -83,7 +83,7 @@ function snow(ebm::EBM, Sf, Rf, Ta, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
 
 
         # Remove snow by sublimation
-        dSice = max(Esnow, 0) * ebm.dt
+        dSice = max(ebm.Esnow, 0) * ebm.dt
         if (dSice > 0)
             for k = 1:ebm.Nsnow
                 if (dSice > ebm.Sice[k])       # Layer sublimates completely
@@ -157,13 +157,8 @@ function snow(ebm::EBM, Sf, Rf, Ta, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
         end
     end  # Existing snowpack
 
-
-
-
-
-
     # Add snowfall and frost to layer 1
-    dSice = Sf * ebm.dt - min(Esnow, 0.) * ebm.dt
+    dSice = Sf * ebm.dt - min(ebm.Esnow, 0.) * ebm.dt
     ebm.Ds[1] = ebm.Ds[1] + dSice / ebm.rfs
     ebm.Sice[1] = ebm.Sice[1] + dSice
 
@@ -270,6 +265,6 @@ function snow(ebm::EBM, Sf, Rf, Ta, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
 
     end
 
-    return snowdepth, SWE, Gsoil
+    return snowdepth, SWE
 end
 
