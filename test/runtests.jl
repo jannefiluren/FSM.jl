@@ -26,7 +26,7 @@ input = Input{Float32}(
 
 ebm = EBM{Float32}()
 
-rfs, fsnow, CH, z0, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE, SWEall = run!(ebm, input)
+Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet, snowdepth, SWE, SWEall = run!(ebm, input)
 
 
 

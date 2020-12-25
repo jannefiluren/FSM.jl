@@ -1,7 +1,5 @@
 function surf_props(ebm::EBM, Sf)
 
-    # ebm.gs = 0  # TODO: Fix later if possible... perhaps remove from here...
-
     # Snow albedo
 
     if ebm.am == 0  # Diagnosed snow albedo
@@ -27,9 +25,9 @@ function surf_props(ebm::EBM, Sf)
     # Density of fresh snow
 
     if (ebm.dm == 0)
-        rfs = ebm.rho0
+        ebm.rfs = ebm.rho0
     elseif (ebm.dm == 1)
-        rfs = ebm.rhof
+        ebm.rfs = ebm.rhof
     end
 
     # Thermal conductivity of snow
@@ -39,7 +37,7 @@ function surf_props(ebm::EBM, Sf)
         ebm.ksnow[:] .= ebm.kfix
     elseif (ebm.cm == 1)  # Density function
         for k in 1:ebm.Nsnow
-            rhos = rfs
+            rhos = ebm.rfs
             if (ebm.dm == 1 && ebm.Ds[k] > eps(first(ebm.Ds)))
                 rhos = (ebm.Sice[k] + ebm.Sliq[k]) / ebm.Ds[k]
             end
@@ -50,9 +48,9 @@ function surf_props(ebm::EBM, Sf)
     # Partial snow cover
 
     snowdepth = sum(ebm.Ds)
-    fsnow = tanh(snowdepth / ebm.hfsn)
-    ebm.alb = fsnow * ebm.albs + (1 - fsnow) * ebm.alb0
-    z0 = (ebm.z0sn^fsnow) * (ebm.z0sf^(1 - fsnow))
+    ebm.fsnow = tanh(snowdepth / ebm.hfsn)
+    ebm.alb = ebm.fsnow * ebm.albs + (1 - ebm.fsnow) * ebm.alb0
+    ebm.z0 = (ebm.z0sn^ebm.fsnow) * (ebm.z0sf^(1 - ebm.fsnow))
 
     # Soil
 
@@ -96,19 +94,18 @@ function surf_props(ebm::EBM, Sf)
 
     # Surface layer
 
-    Dz1 = max(ebm.Dzsoil[1], ebm.Ds[1])
+    ebm.Dz1 = max(ebm.Dzsoil[1], ebm.Ds[1])
 
-    Ts1 = ebm.Tsoil[1] + (ebm.Tsnow[1] - ebm.Tsoil[1]) * ebm.Ds[1] / ebm.Dzsoil[1]
+    ebm.Ts1 = ebm.Tsoil[1] + (ebm.Tsnow[1] - ebm.Tsoil[1]) * ebm.Ds[1] / ebm.Dzsoil[1]
 
-    ksurf = ebm.Dzsoil[1] / (2 * ebm.Ds[1] / ebm.ksnow[1] + (ebm.Dzsoil[1] - 2 * ebm.Ds[1]) / ebm.ksoil[1])
+    ebm.ksurf = ebm.Dzsoil[1] / (2 * ebm.Ds[1] / ebm.ksnow[1] + (ebm.Dzsoil[1] - 2 * ebm.Ds[1]) / ebm.ksoil[1])
 
     if (ebm.Ds[1] > 0.5 * ebm.Dzsoil[1])
-        ksurf = ebm.ksnow[1]
+        ebm.ksurf = ebm.ksnow[1]
     end
 
     if (ebm.Ds[1] > ebm.Dzsoil[1])
-        Ts1 = ebm.Tsnow[1]
+        ebm.Ts1 = ebm.Tsnow[1]
     end
 
-    return rfs, fsnow, z0, ksurf, Ts1, Dz1
 end

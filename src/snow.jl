@@ -1,4 +1,4 @@
-function snow(ebm::EBM, Sf, Rf, Ta, rfs, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
+function snow(ebm::EBM, Sf, Rf, Ta, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
 
     Gsoil = Gsurf
     Roff = Rf * ebm.dt
@@ -164,7 +164,7 @@ function snow(ebm::EBM, Sf, Rf, Ta, rfs, Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet)
 
     # Add snowfall and frost to layer 1
     dSice = Sf * ebm.dt - min(Esnow, 0.) * ebm.dt
-    ebm.Ds[1] = ebm.Ds[1] + dSice / rfs
+    ebm.Ds[1] = ebm.Ds[1] + dSice / ebm.rfs
     ebm.Sice[1] = ebm.Sice[1] + dSice
 
     # New snowpack

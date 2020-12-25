@@ -195,4 +195,25 @@ Base.@kwdef mutable struct EBM{T}
     # Effective albedo
     alb::T = 0
 
+    # Fresh snow density (kg/m^3)
+    rfs::T = 0
+
+    # Snow cover fraction
+    fsnow::T = 0
+
+    # Transfer coefficient for heat and moisture
+    CH::T = 0
+
+    # Surface roughness length (m)
+    z0::T = 0
+
+    # Surface thermal conductivity (W/m/K)
+    ksurf::T = 0
+
+    # Surface layer temperature (K)
+    Ts1::T = 0
+
+    # Surface layer thickness (m)
+    Dz1::T = 0
+
 end
