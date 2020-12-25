@@ -24,12 +24,12 @@ function run!(ebm::EBM, in::Input)
         Qs = qsat(true, Ps, Ta)
         Qa = (RH / 100) * Qs
 
-        rfs, fsnow, z0, ksurf, Ts1, Dz1, alb = surf_props(ebm, Sf)
+        rfs, fsnow, z0, ksurf, Ts1, Dz1 = surf_props(ebm, Sf)
 
 
         for i in 1:6
             CH, z0 = surf_exch(ebm, Ta, Ua, z0)
-            Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet = surf_ebal(ebm, CH, ksurf, Ts1, Dz1, alb, Ta, Qa, Ua, Ps, SW, LW)
+            Esnow, Gsurf, Hsurf, LEsrf, Melt, Rnet = surf_ebal(ebm, CH, ksurf, Ts1, Dz1, Ta, Qa, Ua, Ps, SW, LW)
         end
 
 

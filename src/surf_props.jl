@@ -51,7 +51,7 @@ function surf_props(ebm::EBM, Sf)
 
     snowdepth = sum(ebm.Ds)
     fsnow = tanh(snowdepth / ebm.hfsn)
-    alb = fsnow * ebm.albs + (1 - fsnow) * ebm.alb0
+    ebm.alb = fsnow * ebm.albs + (1 - fsnow) * ebm.alb0
     z0 = (ebm.z0sn^fsnow) * (ebm.z0sf^(1 - fsnow))
 
     # Soil
@@ -110,5 +110,5 @@ function surf_props(ebm::EBM, Sf)
         Ts1 = ebm.Tsnow[1]
     end
 
-    return rfs, fsnow, z0, ksurf, Ts1, Dz1, alb
+    return rfs, fsnow, z0, ksurf, Ts1, Dz1
 end

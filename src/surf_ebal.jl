@@ -1,4 +1,4 @@
-function surf_ebal(ebm::EBM, CH, ksurf, Ts1, Dz1, alb, Ta, Qa, Ua, Ps, SW, LW)
+function surf_ebal(ebm::EBM, CH, ksurf, Ts1, Dz1, Ta, Qa, Ua, Ps, SW, LW)
 
     Qs = qsat(false, Ps, ebm.Tsurf)
 
@@ -21,7 +21,7 @@ function surf_ebal(ebm::EBM, CH, ksurf, Ts1, Dz1, alb, Ta, Qa, Ua, Ps, SW, LW)
     Hsurf = cp * rKH * (ebm.Tsurf - Ta)
     LEsrf = Lh * Esurf
     Melt = 0
-    Rnet = (1 - alb) * SW + LW - sb * ebm.Tsurf^4
+    Rnet = (1 - ebm.alb) * SW + LW - sb * ebm.Tsurf^4
     dTs = (Rnet - Hsurf - LEsrf - Gsurf) / ((cp + Lh * psi * D) * rKH + 2 * ksurf / Dz1 + 4 * sb * ebm.Tsurf^3)
     dE = psi * rKH * D * dTs
     dG = 2 * ksurf * dTs / Dz1
@@ -41,7 +41,7 @@ function surf_ebal(ebm::EBM, CH, ksurf, Ts1, Dz1, alb, Ta, Qa, Ua, Ps, SW, LW)
             Gsurf = 2 * ksurf * (Tm - Ts1) / Dz1
             Hsurf = cp * rKH * (Tm - Ta)
             LEsrf = Ls * Esurf
-            Rnet = (1 - alb) * SW + LW - sb * Tm^4
+            Rnet = (1 - ebm.alb) * SW + LW - sb * Tm^4
             Melt = (Rnet - Hsurf - LEsrf - Gsurf) / Lf
             Melt = max(Melt, 0.)
             dE = 0

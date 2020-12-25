@@ -192,4 +192,7 @@ Base.@kwdef mutable struct EBM{T}
     # Surface moisture conductance (m/s)
     gs::T = 0
 
+    # Effective albedo
+    alb::T = 0
+
 end
