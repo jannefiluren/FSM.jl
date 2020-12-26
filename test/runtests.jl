@@ -26,9 +26,10 @@ input = Input{Float32}(
 
 ebm = EBM{Float32}()
 
-snowdepth, SWE = run!(ebm, input)
+snowdepth = zeros(Float32, length(input.Ta))
+SWE = zeros(Float32, length(input.Ta))
 
-
+run!(ebm, snowdepth, SWE, input)
 
 @testset "complete sim" begin
 

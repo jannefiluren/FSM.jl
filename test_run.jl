@@ -23,9 +23,12 @@ input = Input{Float32}(
     data.Ps,
 )
 
+snowdepth = zeros(Float32, length(input.Ta))
+SWE = zeros(Float32, length(input.Ta))
+
 ebm = EBM{Float32}(am=0, cm=0, dm=0, em=0, hm=0)  ### TODO: something wrong with em!!!
 
-snowdepth, SWE, SWEall = run!(ebm, input)
+run!(ebm, snowdepth, SWE, input)
 
-lineplot(SWEall)
+lineplot(SWE)
 # @run run!(ebm, input)

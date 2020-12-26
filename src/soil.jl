@@ -1,11 +1,11 @@
 function soil(ebm::EBM)
 
-    a = zeros(ebm.Nsoil)  ##### hack
-    b = zeros(ebm.Nsoil)  ##### hack
-    c = zeros(ebm.Nsoil)  ##### hack
-    Gs = zeros(ebm.Nsoil)  ##### hack
-    rhs = zeros(ebm.Nsoil)  ##### hack
-    dTs = zeros(ebm.Nsoil)  ##### hack
+    a = ebm.soil_a
+    b = ebm.soil_b
+    c = ebm.soil_c
+    Gs = ebm.soil_Gs
+    rhs = ebm.soil_rhs
+    dTs = ebm.soil_dTs
 
     for k = 1:(ebm.Nsoil - 1)
         Gs[k] = 2 / (ebm.Dzsoil[k] / ebm.ksoil[k] + ebm.Dzsoil[k + 1] / ebm.ksoil[k + 1])

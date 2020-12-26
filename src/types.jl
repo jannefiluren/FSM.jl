@@ -237,4 +237,23 @@ Base.@kwdef mutable struct EBM{T}
     # Heat flux into soil (W/m^2)
     Gsoil::T = 0
 
+    # Temporary soil variables
+    soil_a::Vector{T} = fill(0, Nsoil)
+    soil_b::Vector{T} = fill(0, Nsoil)
+    soil_c::Vector{T} = fill(0, Nsoil)
+    soil_Gs::Vector{T} = fill(0, Nsoil)
+    soil_rhs::Vector{T} = fill(0, Nsoil)
+    soil_dTs::Vector{T} = fill(0, Nsoil)
+
+    # Temporary snow variables
+    snow_csnow::Vector{T} = fill(0, Nsmax)
+    snow_E::Vector{T} = fill(0, Nsmax)
+    snow_U::Vector{T} = fill(0, Nsmax)
+    snow_Gs::Vector{T} = fill(0, Nsmax)
+    snow_dTs::Vector{T} = fill(0, Nsmax)
+    snow_a::Vector{T} = fill(0, Nsmax)
+    snow_b::Vector{T} = fill(0, Nsmax)
+    snow_c::Vector{T} = fill(0, Nsmax)
+    snow_rhs::Vector{T} = fill(0, Nsmax)
+
 end

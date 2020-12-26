@@ -1,7 +1,4 @@
-function run!(ebm::EBM, in::Input)
-
-    snowdepth = zeros(length(in.Ta))
-    SWE = zeros(length(in.Ta))
+function run!(ebm::EBM, snowdepth::Vector{Float32}, SWE::Vector{Float32}, in::Input)
 
     for i in 1:length(in.year)
 
@@ -33,7 +30,5 @@ function run!(ebm::EBM, in::Input)
         soil(ebm)
 
     end
-
-    return snowdepth, SWE
 
 end

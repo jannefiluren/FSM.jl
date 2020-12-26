@@ -3,17 +3,15 @@ function snow(ebm::EBM, Sf, Rf, Ta)
     ebm.Gsoil = ebm.Gsurf
     Roff = Rf * ebm.dt
 
-
-
-    csnow = zeros(ebm.Nsmax)   ##### hack
-    E = zeros(ebm.Nsmax)  ##### hack
-    U = zeros(ebm.Nsmax)  ##### hack
-    Gs = zeros(ebm.Nsmax)  ##### hack
-    dTs = zeros(ebm.Nsmax)  ##### hack
-    atmp = zeros(ebm.Nsmax)  ##### hack
-    btmp = zeros(ebm.Nsmax)  ##### hack
-    ctmp = zeros(ebm.Nsmax)  ##### hack
-    rhs = zeros(ebm.Nsmax)  ##### hack
+    csnow = ebm.snow_csnow
+    E = ebm.snow_E
+    U = ebm.snow_U
+    Gs = ebm.snow_Gs
+    dTs = ebm.snow_dTs
+    a = ebm.snow_a
+    b = ebm.snow_b
+    c = ebm.snow_c
+    rhs = ebm.snow_rhs
 
     if (ebm.Nsnow > 0)   # Existing snowpack
         # Heat capacity
@@ -29,24 +27,24 @@ function snow(ebm::EBM, Sf, Rf, Ta)
             for k = 1:(ebm.Nsnow - 1)
                 Gs[k] = 2 / (ebm.Ds[k] / ebm.ksnow[k] + ebm.Ds[k + 1] / ebm.ksnow[k + 1])
             end
-            atmp[1] = 0
-            btmp[1] = csnow[1] + Gs[1] * ebm.dt
-            ctmp[1] = - Gs[1] * ebm.dt
+            a[1] = 0
+            b[1] = csnow[1] + Gs[1] * ebm.dt
+            c[1] = - Gs[1] * ebm.dt
             rhs[1] = (ebm.Gsurf - Gs[1] * (ebm.Tsnow[1] - ebm.Tsnow[2])) * ebm.dt
             for k = 2:(ebm.Nsnow - 1)
-                atmp[k] = ctmp[k - 1]
-                btmp[k] = csnow[k] + (Gs[k - 1] + Gs[k]) * ebm.dt
-                ctmp[k] = - Gs[k] * ebm.dt
+                a[k] = c[k - 1]
+                b[k] = csnow[k] + (Gs[k - 1] + Gs[k]) * ebm.dt
+                c[k] = - Gs[k] * ebm.dt
                 rhs[k] = Gs[k - 1] * (ebm.Tsnow[k - 1] - ebm.Tsnow[k]) * ebm.dt + Gs[k] * (ebm.Tsnow[k + 1] - ebm.Tsnow[k]) * ebm.dt
             end
             k = ebm.Nsnow
 
             Gs[k] = 2 / (ebm.Ds[k] / ebm.ksnow[k] + ebm.Dzsoil[1] / ebm.ksoil[1])
-            atmp[k] = ctmp[k - 1]
-            btmp[k] = csnow[k] + (Gs[k - 1] + Gs[k]) * ebm.dt
-            ctmp[k] = 0
+            a[k] = c[k - 1]
+            b[k] = csnow[k] + (Gs[k - 1] + Gs[k]) * ebm.dt
+            c[k] = 0
             rhs[k] = Gs[k - 1] * (ebm.Tsnow[k - 1] - ebm.Tsnow[k]) * ebm.dt + Gs[k] * (ebm.Tsoil[1] - ebm.Tsnow[k]) * ebm.dt
-            tridiag(ebm.Nsnow, ebm.Nsmax, atmp, btmp, ctmp, rhs, dTs)
+            tridiag(ebm.Nsnow, ebm.Nsmax, a, b, c, rhs, dTs)
         end
 
 
