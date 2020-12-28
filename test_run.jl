@@ -30,13 +30,18 @@ input = Input{Float32}(
 
 snowdepth = zeros(Float32, length(input.Ta))
 SWE = zeros(Float32, length(input.Ta))
+Tsurf = zeros(Float32, length(input.Ta))
 
 ebm = EBM{Float32}(am=am, cm=cm, dm=dm, em=em, hm=hm)  ### TODO: something wrong with em!!!
 
-run!(ebm, snowdepth, SWE, input)
+run!(ebm, snowdepth, SWE, Tsurf, input)
 
 plt = lineplot(SWE)
 lineplot!(plt, reference.SWE)
 
 @info maximum(abs.(SWE - reference.SWE))
 
+plt = lineplot(Tsurf)
+lineplot!(plt, reference.Tsurf)
+
+@info maximum(abs.((Tsurf .- 273.15) - reference.Tsurf))

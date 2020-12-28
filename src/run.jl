@@ -1,4 +1,4 @@
-function run!(ebm::EBM, snowdepth::Vector{Float32}, SWE::Vector{Float32}, in::Input)
+function run!(ebm::EBM, snowdepth::Vector{Float32}, SWE::Vector{Float32}, Tsurf::Vector{Float32}, in::Input)
 
     for i in 1:length(in.year)
 
@@ -18,6 +18,8 @@ function run!(ebm::EBM, snowdepth::Vector{Float32}, SWE::Vector{Float32}, in::In
         Qs = qsat(true, Ps, Ta)
         Qa = (RH / 100) * Qs
 
+        Ua = max(Ua, 0.1)
+
         surf_props(ebm, Sf)
 
         for i in 1:6
@@ -28,6 +30,8 @@ function run!(ebm::EBM, snowdepth::Vector{Float32}, SWE::Vector{Float32}, in::In
         snowdepth[i], SWE[i] = snow(ebm, Sf, Rf, Ta)
 
         soil(ebm)
+
+        Tsurf[i] = ebm.Tsurf
 
     end
 
