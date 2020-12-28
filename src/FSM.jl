@@ -13,6 +13,6 @@ include("surf_ebal.jl")
 include("snow.jl")
 include("soil.jl")
 
-export EBM, Input, run!
+export EBM, Input, Constants, run!
 
 end

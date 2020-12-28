@@ -1,12 +1,12 @@
-function qsat(water, P, T)
+function qsat(water, P, T, cn::Constants)
 
-    Tc = T - Tm
+    Tc = T - cn.Tm
     if (Tc > 0 || water)
-        es = e0 * exp(17.5043 * Tc / (241.3 + Tc))
+        es = cn.e0 * exp(17.5043 * Tc / (241.3 + Tc))
     else
-        es = e0 * exp(22.4422 * Tc / (272.186 + Tc))
+        es = cn.e0 * exp(22.4422 * Tc / (272.186 + Tc))
     end
-    Qs = epsm * es / P
+    Qs = cn.eps * es / P
 
     return Qs
 

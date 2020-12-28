@@ -1,4 +1,4 @@
-function snow(ebm::EBM, Sf, Rf, Ta)
+function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta)
 
     ebm.Gsoil = ebm.Gsurf
     Roff = Rf * ebm.dt
@@ -16,7 +16,7 @@ function snow(ebm::EBM, Sf, Rf, Ta)
     if (ebm.Nsnow > 0)   # Existing snowpack
         # Heat capacity
         for k = 1:ebm.Nsnow
-            csnow[k] = ebm.Sice[k] * hcap_ice + ebm.Sliq[k] * hcap_wat
+            csnow[k] = ebm.Sice[k] * cn.hcap_ice + ebm.Sliq[k] * cn.hcap_wat
         end
 
         # Heat conduction
@@ -58,11 +58,11 @@ function snow(ebm::EBM, Sf, Rf, Ta)
         # Convert melting ice to liquid water
         dSice = ebm.Melt * ebm.dt
         for k = 1:ebm.Nsnow
-            coldcont = csnow[k] * (Tm - ebm.Tsnow[k])
+            coldcont = csnow[k] * (cn.Tm - ebm.Tsnow[k])
             if (coldcont < 0)
                 # global dSice  ### HACK
-                dSice = dSice - coldcont / Lf
-                ebm.Tsnow[k] = Tm
+                dSice = dSice - coldcont / cn.Lf
+                ebm.Tsnow[k] = cn.Tm
             end
             if (dSice > 0)
                 if (dSice > ebm.Sice[k])       # Layer melts completely
@@ -109,22 +109,22 @@ function snow(ebm::EBM, Sf, Rf, Ta)
                 # global Roff ### hack
                 phi = 0
                 if (ebm.Ds[k] > eps(first(ebm.Ds)))
-                    phi = 1 - ebm.Sice[k] / (rho_ice * ebm.Ds[k])
+                    phi = 1 - ebm.Sice[k] / (cn.rho_ice * ebm.Ds[k])
                 end
-                SliqMax = rho_wat * ebm.Ds[k] * phi * ebm.Wirr
+                SliqMax = cn.rho_wat * ebm.Ds[k] * phi * ebm.Wirr
                 ebm.Sliq[k] = ebm.Sliq[k] + Roff
                 Roff = 0
                 if (ebm.Sliq[k] > SliqMax)       # Liquid capacity exceeded
                     Roff = ebm.Sliq[k] - SliqMax   # so drainage to next layer
                     ebm.Sliq[k] = SliqMax
                 end
-                coldcont = csnow[k] * (Tm - ebm.Tsnow[k])
+                coldcont = csnow[k] * (cn.Tm - ebm.Tsnow[k])
                 if (coldcont > 0)            # Liquid can freeze
                     # global dSice #### hack
-                    dSice = min(ebm.Sliq[k], coldcont / Lf)
+                    dSice = min(ebm.Sliq[k], coldcont / cn.Lf)
                     ebm.Sliq[k] = ebm.Sliq[k] - dSice
                     ebm.Sice[k] = ebm.Sice[k] + dSice
-                    ebm.Tsnow[k] = ebm.Tsnow[k] + Lf * dSice / csnow[k]
+                    ebm.Tsnow[k] = ebm.Tsnow[k] + cn.Lf * dSice / csnow[k]
                 end
             end
         end
@@ -140,7 +140,7 @@ function snow(ebm::EBM, Sf, Rf, Ta)
             for k = 1:ebm.Nsnow
                 if (ebm.Ds[k] > eps(first(ebm.Ds)))
                     rhos = (ebm.Sice[k] + ebm.Sliq[k]) / ebm.Ds[k]
-                    if (ebm.Tsnow[k] >= Tm)
+                    if (ebm.Tsnow[k] >= cn.Tm)
                         if (rhos < ebm.rmlt)
                             rhos = ebm.rmlt + (rhos - ebm.rmlt) * exp(-ebm.dt / tau)
                         end
@@ -163,7 +163,7 @@ function snow(ebm::EBM, Sf, Rf, Ta)
     # New snowpack
     if (ebm.Nsnow == 0 && ebm.Sice[1] > 0)
         ebm.Nsnow = 1
-        ebm.Tsnow[1] = min(Ta, Tm)
+        ebm.Tsnow[1] = min(Ta, cn.Tm)
     end
 
     # Calculate snow depth and SWE
@@ -182,8 +182,8 @@ function snow(ebm::EBM, Sf, Rf, Ta)
     W = ebm.Sliq[:]
 
     for k = 1:ebm.Nsnow
-        csnow[k] = ebm.Sice[k] * hcap_ice + ebm.Sliq[k] * hcap_wat
-        E[k] = csnow[k] * (ebm.Tsnow[k] - Tm)
+        csnow[k] = ebm.Sice[k] * cn.hcap_ice + ebm.Sliq[k] * cn.hcap_wat
+        E[k] = csnow[k] * (ebm.Tsnow[k] - cn.Tm)
     end
     Nold = ebm.Nsnow
 
@@ -191,7 +191,7 @@ function snow(ebm::EBM, Sf, Rf, Ta)
     ebm.Ds[:] .= 0
     ebm.Sice[:] .= 0
     ebm.Sliq[:] .= 0
-    ebm.Tsnow[:] .= Tm
+    ebm.Tsnow[:] .= cn.Tm
     U[:] .= 0
     ebm.Nsnow = 0
 
@@ -255,9 +255,9 @@ function snow(ebm::EBM, Sf, Rf, Ta)
 
         # Diagnose snow layer temperatures
         for k = 1:ebm.Nsnow
-            csnow[k] = ebm.Sice[k] * hcap_ice + ebm.Sliq[k] * hcap_wat
+            csnow[k] = ebm.Sice[k] * cn.hcap_ice + ebm.Sliq[k] * cn.hcap_wat
             if (csnow[k] > eps(first(csnow)))
-                ebm.Tsnow[k] = Tm + U[k] / csnow[k]
+                ebm.Tsnow[k] = cn.Tm + U[k] / csnow[k]
             end
         end
 

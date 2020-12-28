@@ -1,4 +1,4 @@
-function surf_exch(ebm::EBM, Ta, Ua)
+function surf_exch(ebm::EBM, cn::Constants, Ta, Ua)
 
     zTs = ebm.zT
     if (ebm.zvar)
@@ -8,12 +8,12 @@ function surf_exch(ebm::EBM, Ta, Ua)
 
     # Neutral exchange coefficients
     z0h = 0.1 * ebm.z0
-    CD = (vkman / log(ebm.zU / ebm.z0))^2
-    ebm.CH = vkman^2 / (log(ebm.zU / ebm.z0) * log(zTs / z0h))
+    CD = (cn.vkman / log(ebm.zU / ebm.z0))^2
+    ebm.CH = cn.vkman^2 / (log(ebm.zU / ebm.z0) * log(zTs / z0h))
 
     # Stability correction (Louis et al. 1982, quoted by Beljaars 1992)
     if (ebm.em == 1)
-        RiB = g * (Ta - ebm.Tsurf) * ebm.zU^2 / (zTs * Ta * Ua^2)
+        RiB = cn.g * (Ta - ebm.Tsurf) * ebm.zU^2 / (zTs * Ta * Ua^2)
         if (RiB > 0)
             fh = 1 / (1 + 3 * ebm.bstb * RiB * sqrt(1 + ebm.bstb * RiB))
         else
