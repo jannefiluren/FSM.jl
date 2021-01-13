@@ -51,15 +51,21 @@ input = Input{Float32}(
 
         # Read reference data
 
-        data_ref = CSV.File(joinpath("data", file_ref), header=["year", "month", "day", "hour", "alb", "Roff", "HS", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
+        data_ref = CSV.File(joinpath("data", file_ref), header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
 
         # Compute error
 
-        err = SWE - data_ref.SWE
+        err_snowdepth = snowdepth - data_ref.snowdepth
+        @test maximum(abs.(err_snowdepth)) < 0.01
+        @info maximum(abs.(err_snowdepth))
 
-        @test maximum(abs.(err)) < 10
+        err_swe = SWE - data_ref.SWE
+        @test maximum(abs.(err_swe)) < 0.01
+        @info maximum(abs.(err_swe))
 
-        @info maximum(abs.(err))
+        err_Tsurf = Tsurf - (data_ref.Tsurf .+ 273.15)
+        @test maximum(abs.(err_Tsurf)) < 0.01
+        @info maximum(abs.(err_Tsurf))
 
     end
 
