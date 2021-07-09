@@ -2,7 +2,7 @@ using FSM
 using CSV
 using DataFrames
 
-data_force = CSV.File("../data/met_CdP_0506.csv") |> DataFrame
+data_force = CSV.File("data/met_CdP_0506.csv") |> DataFrame
 
 input = Input{Float32}(
     data_force.year,
@@ -19,7 +19,13 @@ input = Input{Float32}(
     data_force.Ps,
     )
 
-ebm = EBM{Float32}()
+ebm = EBM{Float32}(
+        am=1,
+        cm=1,
+        dm=1,
+        em=1,
+        hm=1,
+    )
 
 cn = Constants{Float32}()
 
