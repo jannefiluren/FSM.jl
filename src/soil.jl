@@ -8,9 +8,9 @@ function soil(ebm::EBM)
     dTs = ebm.soil_dTs
 
     for k = 1:(ebm.Nsoil - 1)
-        Gs[k] = 2 / (ebm.Dzsoil[k] / ebm.ksoil[k] + ebm.Dzsoil[k + 1] / ebm.ksoil[k + 1])
+        Gs[k] = 2.0 / (ebm.Dzsoil[k] / ebm.ksoil[k] + ebm.Dzsoil[k + 1] / ebm.ksoil[k + 1])
     end
-    a[1] = 0
+    a[1] = 0.0
     b[1] = ebm.csoil[1] + Gs[1] * ebm.dt
     c[1] = - Gs[1] * ebm.dt
     rhs[1] = (ebm.Gsoil - Gs[1] * (ebm.Tsoil[1] - ebm.Tsoil[2])) * ebm.dt
@@ -24,11 +24,13 @@ function soil(ebm::EBM)
     Gs[k] = ebm.ksoil[k] / ebm.Dzsoil[k]
     a[k] = c[k - 1]
     b[k] = ebm.csoil[k] + (Gs[k - 1] + Gs[k]) * ebm.dt
-    c[k] = 0
+    c[k] = 0.0
     rhs[k] = Gs[k - 1] * (ebm.Tsoil[k - 1] - ebm.Tsoil[k]) * ebm.dt
-    tridiag(ebm.Nsoil, ebm.Nsoil, a, b, c, rhs, dTs)
+    tridiag(ebm.Nsoil, ebm.soil_gamma, a, b, c, rhs, dTs)
     for k = 1:ebm.Nsoil
         ebm.Tsoil[k] = ebm.Tsoil[k] + dTs[k]
     end
+
+    return  nothing
 
 end

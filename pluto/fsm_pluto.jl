@@ -82,12 +82,12 @@ md"""Setup simulations..."""
 
 # ╔═╡ 980e8ac4-4771-11eb-0a52-c35a9a0a00ea
 begin
-	
+
 	# Load forcing data
-	
+
 	data_force = CSV.File("../data/met_CdP_0506.csv") |> DataFrame
 
-	input = Input{Float32}(
+	input = Input{Float64}(
 		data_force.year,
 		data_force.month,
 		data_force.day,
@@ -101,10 +101,10 @@ begin
 		data_force.Ua,
 		data_force.Ps,
 		)
-	
+
 	# Initilize model for experiments
 
-	ebm = EBM{Float32}(
+	ebm = EBM{Float64}(
 		am=parse(Int, am),
 		cm=parse(Int, cm),
 		dm=parse(Int, dm),
@@ -115,19 +115,19 @@ begin
 		Tsoil=[282.98, 284.17, 284.70, 284.70]
 	)
 
-	cn = Constants{Float32}()
+	cn = Constants{Float64}()
 
 	hs_exp = similar(input.Ta)
 	swe_exp = similar(input.Ta)
 	tsurf_exp = similar(input.Ta)
-	
+
 	run!(ebm, cn, hs_exp, swe_exp, tsurf_exp, input)
-	
+
 	hs_base = similar(input.Ta)
 	swe_base = similar(input.Ta)
 	tsurf_base = similar(input.Ta)
 
-	ebm = EBM{Float32}(
+	ebm = EBM{Float64}(
 		am=0,
 		cm=0,
 		dm=0,
@@ -139,15 +139,15 @@ begin
 	)
 
 	run!(ebm, cn, hs_base, swe_base, tsurf_base, input)
-	
+
 end
 
 # ╔═╡ 7c6e503c-55aa-11eb-040e-69123898c27b
 begin
 	file_ref = "out_CdP_0506_$(am)$(cm)$(dm)$(em)$(hm).txt"
-	
+
 	data_ref = CSV.File(joinpath("../test/data", file_ref), header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
-	
+
 	hs_ref = data_ref.snowdepth
 	swe_ref = data_ref.SWE
 	tsurf_ref = data_ref.Tsurf
@@ -169,7 +169,7 @@ end
 
 # ╔═╡ 062a89c0-5825-11eb-30c0-1d2e3d30e3e6
 begin
-	plot(tsurf_ref.+273.15, ylabel="Surface temperature (K)", linewidth=2, label="Ref")
+	plot(tsurf_ref .+ 273.15, ylabel="Surface temperature (K)", linewidth=2, label="Ref")
 	plot!(tsurf_exp, label="Exp")
 	plot!(tsurf_base, label="Base")
 end

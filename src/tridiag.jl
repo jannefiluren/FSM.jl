@@ -1,6 +1,6 @@
-function tridiag(Nvec, Nmax, a, b, c, r, x)
+function tridiag(Nvec, gamma, a, b, c, r, x)
 
-    gamma = zeros(Nvec)
+    gamma .= 0.0
 
     beta = b[1]
     x[1] = r[1] / beta
@@ -14,5 +14,7 @@ function tridiag(Nvec, Nmax, a, b, c, r, x)
     for n = (Nvec - 1):-1:1
         x[n] = x[n] - gamma[n + 1] * x[n + 1]
     end
+
+    return nothing
 
 end

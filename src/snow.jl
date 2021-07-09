@@ -1,4 +1,4 @@
-function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta)
+function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta, D, S, W)
 
     ebm.Gsoil = ebm.Gsurf
     Roff = Rf * ebm.dt
@@ -21,13 +21,13 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta)
 
         # Heat conduction
         if (ebm.Nsnow == 1)
-            Gs[1] = 2 / (ebm.Ds[1] / ebm.ksnow[1] + ebm.Dzsoil[1] / ebm.ksoil[1])
+            Gs[1] = 2.0 / (ebm.Ds[1] / ebm.ksnow[1] + ebm.Dzsoil[1] / ebm.ksoil[1])
             dTs[1] = (ebm.Gsurf + Gs[1] * (ebm.Tsoil[1] - ebm.Tsnow[1])) * ebm.dt / (csnow[1] + Gs[1] * ebm.dt)
         else
             for k = 1:(ebm.Nsnow - 1)
-                Gs[k] = 2 / (ebm.Ds[k] / ebm.ksnow[k] + ebm.Ds[k + 1] / ebm.ksnow[k + 1])
+                Gs[k] = 2.0 / (ebm.Ds[k] / ebm.ksnow[k] + ebm.Ds[k + 1] / ebm.ksnow[k + 1])
             end
-            a[1] = 0
+            a[1] = 0.0
             b[1] = csnow[1] + Gs[1] * ebm.dt
             c[1] = - Gs[1] * ebm.dt
             rhs[1] = (ebm.Gsurf - Gs[1] * (ebm.Tsnow[1] - ebm.Tsnow[2])) * ebm.dt
@@ -39,12 +39,12 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta)
             end
             k = ebm.Nsnow
 
-            Gs[k] = 2 / (ebm.Ds[k] / ebm.ksnow[k] + ebm.Dzsoil[1] / ebm.ksoil[1])
+            Gs[k] = 2.0 / (ebm.Ds[k] / ebm.ksnow[k] + ebm.Dzsoil[1] / ebm.ksoil[1])
             a[k] = c[k - 1]
             b[k] = csnow[k] + (Gs[k - 1] + Gs[k]) * ebm.dt
-            c[k] = 0
+            c[k] = 0.0
             rhs[k] = Gs[k - 1] * (ebm.Tsnow[k - 1] - ebm.Tsnow[k]) * ebm.dt + Gs[k] * (ebm.Tsoil[1] - ebm.Tsnow[k]) * ebm.dt
-            tridiag(ebm.Nsnow, ebm.Nsmax, a, b, c, rhs, dTs)
+            tridiag(ebm.Nsnow, ebm.snow_gamma, a, b, c, rhs, dTs)
         end
 
 
@@ -59,40 +59,40 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta)
         dSice = ebm.Melt * ebm.dt
         for k = 1:ebm.Nsnow
             coldcont = csnow[k] * (cn.Tm - ebm.Tsnow[k])
-            if (coldcont < 0)
+            if (coldcont < 0.0)
                 # global dSice  ### HACK
                 dSice = dSice - coldcont / cn.Lf
                 ebm.Tsnow[k] = cn.Tm
             end
-            if (dSice > 0)
+            if (dSice > 0.0)
                 if (dSice > ebm.Sice[k])       # Layer melts completely
                     dSice = dSice - ebm.Sice[k]
-                    ebm.Ds[k] = 0
+                    ebm.Ds[k] = 0.0
                     ebm.Sliq[k] = ebm.Sliq[k] + ebm.Sice[k]
-                    ebm.Sice[k] = 0
+                    ebm.Sice[k] = 0.0
                 else                       # Layer melts partially
-                    ebm.Ds[k] = (1 - dSice / ebm.Sice[k]) * ebm.Ds[k]
+                    ebm.Ds[k] = (1.0 - dSice / ebm.Sice[k]) * ebm.Ds[k]
                     ebm.Sice[k] = ebm.Sice[k] - dSice
                     ebm.Sliq[k] = ebm.Sliq[k] + dSice
-                    dSice = 0                # Melt exhausted
+                    dSice = 0.0                # Melt exhausted
                 end
             end
         end
 
 
         # Remove snow by sublimation
-        dSice = max(ebm.Esnow, 0) * ebm.dt
-        if (dSice > 0)
+        dSice = max(ebm.Esnow, 0.0) * ebm.dt
+        if (dSice > 0.0)
             for k = 1:ebm.Nsnow
                 if (dSice > ebm.Sice[k])       # Layer sublimates completely
                     # global dSice #### hack
                     dSice = dSice - ebm.Sice[k]
-                    ebm.Ds[k] = 0
-                    ebm.Sice[k] = 0
+                    ebm.Ds[k] = 0.0
+                    ebm.Sice[k] = 0.0
                 else                       # Layer sublimates partially
-                    ebm.Ds[k] = (1 - dSice / ebm.Sice[k]) * ebm.Ds[k]
+                    ebm.Ds[k] = (1.0 - dSice / ebm.Sice[k]) * ebm.Ds[k]
                     ebm.Sice[k] = ebm.Sice[k] - dSice
-                    dSice = 0                # Sublimation exhausted
+                    dSice = 0.0                # Sublimation exhausted
                 end
             end
         end
@@ -102,24 +102,24 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta)
             for k = 1:ebm.Nsnow
                 # global Roff ### hack
                 Roff = Roff + ebm.Sliq[k]
-                ebm.Sliq[k] = 0
+                ebm.Sliq[k] = 0.0
             end
         elseif ebm.hm == 1  #  Bucket storage
             for k = 1:ebm.Nsnow
                 # global Roff ### hack
-                phi = 0
+                phi = 0.0
                 if (ebm.Ds[k] > eps(first(ebm.Ds)))
-                    phi = 1 - ebm.Sice[k] / (cn.rho_ice * ebm.Ds[k])
+                    phi = 1.0 - ebm.Sice[k] / (cn.rho_ice * ebm.Ds[k])
                 end
                 SliqMax = cn.rho_wat * ebm.Ds[k] * phi * ebm.Wirr
                 ebm.Sliq[k] = ebm.Sliq[k] + Roff
-                Roff = 0
+                Roff = 0.0
                 if (ebm.Sliq[k] > SliqMax)       # Liquid capacity exceeded
                     Roff = ebm.Sliq[k] - SliqMax   # so drainage to next layer
                     ebm.Sliq[k] = SliqMax
                 end
                 coldcont = csnow[k] * (cn.Tm - ebm.Tsnow[k])
-                if (coldcont > 0)            # Liquid can freeze
+                if (coldcont > 0.0)            # Liquid can freeze
                     # global dSice #### hack
                     dSice = min(ebm.Sliq[k], coldcont / cn.Lf)
                     ebm.Sliq[k] = ebm.Sliq[k] - dSice
@@ -136,7 +136,7 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta)
                 ebm.Ds[k] = (ebm.Sice[k] + ebm.Sliq[k]) / ebm.rho0
             end
         elseif ebm.dm == 1  # Prognostic snow density
-            tau = 3600 * ebm.trho
+            tau = 3600.0 * ebm.trho
             for k = 1:ebm.Nsnow
                 if (ebm.Ds[k] > eps(first(ebm.Ds)))
                     rhos = (ebm.Sice[k] + ebm.Sliq[k]) / ebm.Ds[k]
@@ -156,19 +156,19 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta)
     end  # Existing snowpack
 
     # Add snowfall and frost to layer 1
-    dSice = Sf * ebm.dt - min(ebm.Esnow, 0.) * ebm.dt
+    dSice = Sf * ebm.dt - min(ebm.Esnow, 0.0) * ebm.dt
     ebm.Ds[1] = ebm.Ds[1] + dSice / ebm.rfs
     ebm.Sice[1] = ebm.Sice[1] + dSice
 
     # New snowpack
-    if (ebm.Nsnow == 0 && ebm.Sice[1] > 0)
+    if (ebm.Nsnow == 0 && ebm.Sice[1] > 0.0)
         ebm.Nsnow = 1
         ebm.Tsnow[1] = min(Ta, cn.Tm)
     end
 
     # Calculate snow depth and SWE
-    snowdepth = 0
-    SWE = 0
+    snowdepth = 0.0
+    SWE = 0.0
     for k = 1:ebm.Nsnow
        # global SWE
        # global snowdepth
@@ -177,9 +177,9 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta)
     end
 
     # Store state of old layers
-    D = ebm.Ds[:]
-    S = ebm.Sice[:]
-    W = ebm.Sliq[:]
+    D .= ebm.Ds
+    S .= ebm.Sice
+    W .= ebm.Sliq
 
     for k = 1:ebm.Nsnow
         csnow[k] = ebm.Sice[k] * cn.hcap_ice + ebm.Sliq[k] * cn.hcap_wat
@@ -188,14 +188,14 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta)
     Nold = ebm.Nsnow
 
     # Initialise new layers
-    ebm.Ds[:] .= 0
-    ebm.Sice[:] .= 0
-    ebm.Sliq[:] .= 0
+    ebm.Ds[:] .= 0.0
+    ebm.Sice[:] .= 0.0
+    ebm.Sliq[:] .= 0.0
     ebm.Tsnow[:] .= cn.Tm
-    U[:] .= 0
-    ebm.Nsnow = 0
+    U[:] .= 0.0
+    ebm.Nsnow = 0.0
 
-    if (SWE > 0)       # Existing or new snowpack
+    if (SWE > 0.0)       # Existing or new snowpack
 
         # Re-assign and count snow layers
         dnew = snowdepth
@@ -214,7 +214,15 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta)
             end
         end
         # Nsnow = k   hackhackhack
-        ebm.Nsnow = sum(ebm.Ds .> 0)
+        # ebm.Nsnow = sum(ebm.Ds .> 0)
+
+        ebm.Nsnow = 0
+        for Ds in ebm.Ds
+            if Ds > 0.0
+                ebm.Nsnow += 1
+            end
+        end
+
 
         # Fill new layers from the top downwards
         knew = 1
@@ -265,4 +273,3 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta)
 
     return snowdepth, SWE
 end
-

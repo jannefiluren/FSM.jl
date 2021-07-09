@@ -272,6 +272,7 @@ Base.@kwdef mutable struct EBM{T}
     soil_Gs::Vector{T} = fill(0, Nsoil)
     soil_rhs::Vector{T} = fill(0, Nsoil)
     soil_dTs::Vector{T} = fill(0, Nsoil)
+    soil_gamma::Vector{T} = fill(0, Nsoil)
 
     # Temporary snow variables
     snow_csnow::Vector{T} = fill(0, Nsmax)
@@ -283,5 +284,6 @@ Base.@kwdef mutable struct EBM{T}
     snow_b::Vector{T} = fill(0, Nsmax)
     snow_c::Vector{T} = fill(0, Nsmax)
     snow_rhs::Vector{T} = fill(0, Nsmax)
+    snow_gamma::Vector{T} = fill(0, Nsmax)
 
 end
