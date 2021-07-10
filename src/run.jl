@@ -1,4 +1,4 @@
-function run!(ebm::EBM, cn::Constants, snowdepth::Vector{Float32}, SWE::Vector{Float32}, Tsurf::Vector{Float32}, in::Input)
+function run!(ebm::EBM, cn::Constants, snowdepth::Vector{Float64}, SWE::Vector{Float64}, Tsurf::Vector{Float64}, in::Input)
 
     for i in 1:length(in.year)
 

@@ -4,7 +4,10 @@ using DataFrames
 
 data_force = CSV.File("data/met_CdP_0506.csv") |> DataFrame
 
-input = Input{Float32}(
+data_ref = CSV.File("test/output_float64/out_CdP_0506_11101.txt", header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
+
+
+input = Input{Float64}(
     data_force.year,
     data_force.month,
     data_force.day,
@@ -19,15 +22,18 @@ input = Input{Float32}(
     data_force.Ps,
     )
 
-ebm = EBM{Float32}(
+ebm = EBM{Float64}(
         am=1,
         cm=1,
         dm=1,
-        em=1,
+        em=0,
         hm=1,
+        zT=1.5,
+        zvar=false,
+        Tsoil=[282.98, 284.17, 284.70, 284.70]
     )
 
-cn = Constants{Float32}()
+cn = Constants{Float64}()
 
 snowdepth = similar(input.Ta)
 SWE = similar(input.Ta)
