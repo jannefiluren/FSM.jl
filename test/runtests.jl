@@ -5,7 +5,7 @@ using DataFrames
 
 data_force = CSV.File("../data/met_CdP_0506.csv") |> DataFrame
 
-input = Input{Float32}(
+input = Input{Float64}(
     data_force.year,
     data_force.month,
     data_force.day,
@@ -22,13 +22,14 @@ input = Input{Float32}(
 
 @testset "complete sim" begin
 
-    files_ref = readdir("data")
+    path_ref = "output_float64/"
+    files_ref = readdir(path_ref)
 
     for file_ref in files_ref
 
         # Initilize model
 
-        ebm = EBM{Float32}(
+        ebm = EBM{Float64}(
             am=parse(Int, file_ref[14]),
             cm=parse(Int, file_ref[15]),
             dm=parse(Int, file_ref[16]),
@@ -39,7 +40,7 @@ input = Input{Float32}(
             Tsoil=[282.98, 284.17, 284.70, 284.70]
         )
 
-        cn = Constants{Float32}()
+        cn = Constants{Float64}()
 
         snowdepth = similar(input.Ta)
         SWE = similar(input.Ta)
@@ -51,9 +52,11 @@ input = Input{Float32}(
 
         # Read reference data
 
-        data_ref = CSV.File(joinpath("data", file_ref), header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
+        data_ref = CSV.File(joinpath(path_ref, file_ref), header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
 
         # Compute error
+
+        println(file_ref)
 
         err_snowdepth = snowdepth - data_ref.snowdepth
         @test maximum(abs.(err_snowdepth)) < 0.01
