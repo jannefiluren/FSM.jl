@@ -22,7 +22,8 @@ input = Input{Float64}(
 
 @testset "complete sim" begin
 
-    files_ref = readdir("data")
+    path_ref = "output_float64/"
+    files_ref = readdir(path_ref)
 
     for file_ref in files_ref
 
@@ -51,20 +52,22 @@ input = Input{Float64}(
 
         # Read reference data
 
-        data_ref = CSV.File(joinpath("data", file_ref), header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
+        data_ref = CSV.File(joinpath(path_ref, file_ref), header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
 
         # Compute error
 
+        println(file_ref)
+
         err_snowdepth = snowdepth - data_ref.snowdepth
-        @test maximum(abs.(err_snowdepth)) < 0.1
+        @test maximum(abs.(err_snowdepth)) < 0.01
         @info maximum(abs.(err_snowdepth))
 
         err_swe = SWE - data_ref.SWE
-        @test maximum(abs.(err_swe)) < 0.1
+        @test maximum(abs.(err_swe)) < 0.01
         @info maximum(abs.(err_swe))
 
         err_Tsurf = Tsurf - (data_ref.Tsurf .+ 273.15)
-        @test maximum(abs.(err_Tsurf)) < 0.5
+        @test maximum(abs.(err_Tsurf)) < 0.01
         @info maximum(abs.(err_Tsurf))
 
     end
