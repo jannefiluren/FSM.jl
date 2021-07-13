@@ -1,16 +1,13 @@
 using FSM
 using CSV
 using DataFrames
-using ProgressMeter
+using Plots
 
 data_force = CSV.File("data/met_CdP_0506.csv") |> DataFrame
 
-<<<<<<< HEAD
-=======
-data_ref = CSV.File("test/output_float64/out_CdP_0506_11101.txt", header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
+data_ref = CSV.File("test/output_float64/out_CdP_0506_00000.txt", header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
 
 
->>>>>>> float_point
 input = Input{Float64}(
     data_force.year,
     data_force.month,
@@ -26,46 +23,24 @@ input = Input{Float64}(
     data_force.Ps,
     )
 
-<<<<<<< HEAD
-function run_many(n)
-
-    snowdepth = similar(input.Ta)
-    SWE = similar(input.Ta)
-    Tsurf = similar(input.Ta)
-=======
 ebm = EBM{Float64}(
-        am=1,
-        cm=1,
-        dm=1,
+        am=0,
+        cm=0,
+        dm=0,
         em=0,
-        hm=1,
+        hm=0,
         zT=1.5,
         zvar=false,
         Tsoil=[282.98, 284.17, 284.70, 284.70]
     )
 
 cn = Constants{Float64}()
->>>>>>> float_point
 
-    @showprogress 1 "Computing..." for i in 1:n
-        ebm = EBM{Float64}(
-            am=1,
-            cm=1,
-            dm=1,
-            em=1,
-            hm=1,
-        )
+snowdepth = similar(input.Ta)
+SWE = similar(input.Ta)
+Tsurf = similar(input.Ta)
 
-        cn = Constants{Float64}()
+run!(ebm, cn, snowdepth, SWE, Tsurf, input)
 
-        snowdepth .= 0
-        SWE .= 0
-        Tsurf .= 0
-
-        run!(ebm, cn, snowdepth, SWE, Tsurf, input)
-
-    end
-
-end
-
-@time run_many(100000)
+plot(data_ref.SWE - SWE)
+plot(data_ref.Tsurf - Tsurf .+ 273.15)

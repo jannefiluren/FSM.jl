@@ -38,7 +38,7 @@ function surf_props(ebm::EBM, cn::Constants, Sf)
     elseif (ebm.cm == 1)  # Density function
         for k in 1:ebm.Nsnow
             rhos = ebm.rfs
-            if (ebm.dm == 1 && ebm.Ds[k] > eps(first(ebm.Ds)))
+            if (ebm.dm == 1 && ebm.Ds[k] > eps(Float64))
                 rhos = (ebm.Sice[k] + ebm.Sliq[k]) / ebm.Ds[k]
             end
             ebm.ksnow[k] = cn.hcon_ice * (rhos / cn.rho_ice)^ebm.bthr
@@ -59,7 +59,7 @@ function surf_props(ebm::EBM, cn::Constants, Sf)
     for k in 1:ebm.Nsoil
         ebm.csoil[k] = ebm.hcap_soil * ebm.Dzsoil[k]
         ebm.ksoil[k] = ebm.hcon_soil
-        if (ebm.theta[k] > eps(first(ebm.theta)))
+        if (ebm.theta[k] > eps(Float64))
             dthudT = 0.0
             sthu = ebm.theta[k]
             sthf = 0.0

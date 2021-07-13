@@ -108,7 +108,7 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta, D, S, W)
             for k = 1:ebm.Nsnow
                 # global Roff ### hack
                 phi = 0.0
-                if (ebm.Ds[k] > eps(first(ebm.Ds)))
+                if (ebm.Ds[k] > eps(Float64))
                     phi = 1.0 - ebm.Sice[k] / (cn.rho_ice * ebm.Ds[k])
                 end
                 SliqMax = cn.rho_wat * ebm.Ds[k] * phi * ebm.Wirr
@@ -138,7 +138,7 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta, D, S, W)
         elseif ebm.dm == 1  # Prognostic snow density
             tau = 3600.0 * ebm.trho
             for k = 1:ebm.Nsnow
-                if (ebm.Ds[k] > eps(first(ebm.Ds)))
+                if (ebm.Ds[k] > eps(Float64))
                     rhos = (ebm.Sice[k] + ebm.Sliq[k]) / ebm.Ds[k]
                     if (ebm.Tsnow[k] >= cn.Tm)
                         if (rhos < ebm.rmlt)
@@ -264,7 +264,7 @@ function snow(ebm::EBM, cn::Constants, Sf, Rf, Ta, D, S, W)
         # Diagnose snow layer temperatures
         for k = 1:ebm.Nsnow
             csnow[k] = ebm.Sice[k] * cn.hcap_ice + ebm.Sliq[k] * cn.hcap_wat
-            if (csnow[k] > eps(first(csnow)))
+            if (csnow[k] > eps(Float64))
                 ebm.Tsnow[k] = cn.Tm + U[k] / csnow[k]
             end
         end
