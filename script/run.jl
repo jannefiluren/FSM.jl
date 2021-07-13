@@ -1,10 +1,11 @@
 using FSM
 using CSV
 using DataFrames
+using Plots
 
 data_force = CSV.File("data/met_CdP_0506.csv") |> DataFrame
 
-data_ref = CSV.File("test/output_float64/out_CdP_0506_11101.txt", header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
+data_ref = CSV.File("test/output_float64/out_CdP_0506_00000.txt", header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
 
 
 input = Input{Float64}(
@@ -23,11 +24,11 @@ input = Input{Float64}(
     )
 
 ebm = EBM{Float64}(
-        am=1,
-        cm=1,
-        dm=1,
+        am=0,
+        cm=0,
+        dm=0,
         em=0,
-        hm=1,
+        hm=0,
         zT=1.5,
         zvar=false,
         Tsoil=[282.98, 284.17, 284.70, 284.70]
@@ -40,3 +41,6 @@ SWE = similar(input.Ta)
 Tsurf = similar(input.Ta)
 
 run!(ebm, cn, snowdepth, SWE, Tsurf, input)
+
+plot(data_ref.SWE - SWE)
+plot(data_ref.Tsurf - Tsurf .+ 273.15)
