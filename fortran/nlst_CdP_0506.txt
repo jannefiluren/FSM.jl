@@ -1,0 +1,17 @@
+! namelists for running FSM with the Col de Porte example
+&config
+/
+&drive
+  met_file = 'data/met_CdP_0506.txt'
+  zT = 1.5
+  zvar = .FALSE.
+/
+&params
+/
+&initial
+  Tsoil = 282.98 284.17 284.70 284.70
+/
+&outputs
+  out_file = 'out_CdP_0506.txt'
+  Nave = 1
+/
