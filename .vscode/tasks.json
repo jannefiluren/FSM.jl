@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build executable",
+            "type": "shell",
+            "command": "./compil_executable.sh",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/fortran"
+            }
+        },
+        {
+            "label": "build shared",
+            "type": "shell",
+            "command": "./compil_shared.sh",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/fortran"
+            }
+        },
+    ]
+}
