@@ -22,7 +22,7 @@ input = Input{Float64}(
 
 @testset "complete sim" begin
 
-    path_ref = "output_float64/"
+    path_ref = "../fortran/output/"
     files_ref = readdir(path_ref)
 
     for file_ref in files_ref

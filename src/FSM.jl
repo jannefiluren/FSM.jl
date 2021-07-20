@@ -2,6 +2,8 @@ module FSM
 
 using Debugger
 
+const fsm_file = joinpath(dirname(@__FILE__), "..", "fortran", "FSM")
+
 include("constants.jl")
 include("types.jl")
 include("run.jl")

@@ -5,8 +5,7 @@ using Plots
 
 data_force = CSV.File("data/met_CdP_0506.csv") |> DataFrame
 
-data_ref = CSV.File("test/output_float64/out_CdP_0506_00000.txt", header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
-
+data_ref = CSV.File("fortran/output/out_CdP_0506_11111.txt", header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
 
 input = Input{Float64}(
     data_force.year,
@@ -24,11 +23,11 @@ input = Input{Float64}(
     )
 
 ebm = EBM{Float64}(
-        am=0,
-        cm=0,
-        dm=0,
-        em=0,
-        hm=0,
+        am=1,
+        cm=1,
+        dm=1,
+        em=1,
+        hm=1,
         zT=1.5,
         zvar=false,
         Tsoil=[282.98, 284.17, 284.70, 284.70]
