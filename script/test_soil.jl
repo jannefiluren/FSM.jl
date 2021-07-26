@@ -1,7 +1,5 @@
 using FSM
 
-cn = Constants{Float64}()
-
 ebm = EBM{Float64}(
     am=1,
     cm=1,

@@ -14,34 +14,6 @@ struct Input{T}
 end
 
 
-Base.@kwdef struct Constants{T}
-
-    cp::T = 1005          # Specific heat capacity of dry air (J/K/kg)
-    eps::T = 0.622       # Ratio of molecular weights of water and dry air    BEFORE eps
-    e0::T = 611.213       # Saturation vapour pressure at Tm (Pa)
-    g::T = 9.81           # Acceleration due to gravity (m/s^2)
-    hcap_ice::T = 2100.   # Specific heat capacity of ice (J/K/kg)
-    hcap_wat::T = 4180.   # Specific heat capacity of water (J/K/kg)
-    hcon_air::T = 0.025   # Thermal conductivity of air (W/m/K)
-    hcon_clay::T = 1.16   # Thermal conductivity of clay (W/m/K)
-    hcon_ice::T = 2.24    # Thermal conducivity of ice (W/m/K)
-    hcon_sand::T = 1.57   # Thermal conductivity of sand (W/m/K)
-    hcon_wat::T = 0.56    # Thermal conductivity of water (W/m/K)
-    Lc::T = 2.501e6       # Latent heat of condensation (J/kg)
-    Lf::T = 0.334e6       # Latent heat of fusion (J/kg)
-    Ls::T = Lc + Lf       # Latent heat of sublimation (J/kg)
-    R::T = 8.3145         # Universal gas constant (J/K/mol)
-    Rgas::T = 287         # Gas constant for dry air (J/K/kg)
-    Rwat::T = 462         # Gas constant for water vapour (J/K/kg)
-    rho_ice::T = 917.     # Density of ice (kg/m^3)
-    rho_wat::T = 1000.    # Density of water (kg/m^3)
-    sb::T = 5.67e-8       # Stefan-Boltzmann constant (W/m^2/K^4)
-    Tm::T = 273.15        # Melting point (K)
-    vkman::T = 0.4        # Von Karman constant
-
-end
-
-
 Base.@kwdef mutable struct EBM{T}
 
     ### Settings ##############################################################

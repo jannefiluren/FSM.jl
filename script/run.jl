@@ -33,13 +33,11 @@ ebm = EBM{Float64}(
         Tsoil=[282.98, 284.17, 284.70, 284.70]
     )
 
-cn = Constants{Float64}()
-
 snowdepth = similar(input.Ta)
 SWE = similar(input.Ta)
 Tsurf = similar(input.Ta)
 
-run!(ebm, cn, snowdepth, SWE, Tsurf, input)
+run!(ebm, snowdepth, SWE, Tsurf, input)
 
 plot(data_ref.SWE - SWE)
 plot(data_ref.Tsurf - Tsurf .+ 273.15)

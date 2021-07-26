@@ -1,12 +1,12 @@
-function surf_props(ebm::EBM, cn::Constants, Sf)
+function surf_props(ebm::EBM, Sf)
 
     # Snow albedo
 
     if ebm.am == 0  # Diagnosed snow albedo
-        ebm.albs = ebm.asmn + (ebm.asmx - ebm.asmn) * (ebm.Tsurf - cn.Tm) / ebm.Talb
+        ebm.albs = ebm.asmn + (ebm.asmx - ebm.asmn) * (ebm.Tsurf - Tm) / ebm.Talb
     elseif ebm.am == 1  # Prognostic snow albedo
         tau = 3600.0 * ebm.tcld
-        if (ebm.Tsurf >= cn.Tm)
+        if (ebm.Tsurf >= Tm)
             tau = 3600.0 * ebm.tmlt
         end
         rt = 1.0 / tau + Sf / ebm.Salb
@@ -41,7 +41,7 @@ function surf_props(ebm::EBM, cn::Constants, Sf)
             if (ebm.dm == 1 && ebm.Ds[k] > eps(Float64))
                 rhos = (ebm.Sice[k] + ebm.Sliq[k]) / ebm.Ds[k]
             end
-            ebm.ksnow[k] = cn.hcon_ice * (rhos / cn.rho_ice)^ebm.bthr
+            ebm.ksnow[k] = hcon_ice * (rhos / rho_ice)^ebm.bthr
         end
     end
 
@@ -54,7 +54,7 @@ function surf_props(ebm::EBM, cn::Constants, Sf)
 
     # Soil
 
-    dPsidT = - cn.rho_ice * cn.Lf / (cn.rho_wat * cn.g * cn.Tm)
+    dPsidT = - rho_ice * Lf / (rho_wat * g * Tm)
 
     for k in 1:ebm.Nsoil
         ebm.csoil[k] = ebm.hcap_soil * ebm.Dzsoil[k]
@@ -63,18 +63,18 @@ function surf_props(ebm::EBM, cn::Constants, Sf)
             dthudT = 0.0
             sthu = ebm.theta[k]
             sthf = 0.0
-            Tc = ebm.Tsoil[k] - cn.Tm
-            Tmax = cn.Tm + (ebm.sathh / dPsidT) * (ebm.Vsat / ebm.theta[k])^ebm.b
+            Tc = ebm.Tsoil[k] - Tm
+            Tmax = Tm + (ebm.sathh / dPsidT) * (ebm.Vsat / ebm.theta[k])^ebm.b
             if (ebm.Tsoil[k] < Tmax)
                 dthudT = (-dPsidT * ebm.Vsat / (ebm.b * ebm.sathh)) * (dPsidT * Tc / ebm.sathh)^(-1 / ebm.b - 1)
                 sthu = ebm.Vsat * (dPsidT * Tc / ebm.sathh)^(-1.0 / ebm.b)
                 sthu = min(sthu, ebm.theta[k])
-                sthf = (ebm.theta[k] - sthu) * cn.rho_wat / cn.rho_ice
+                sthf = (ebm.theta[k] - sthu) * rho_wat / rho_ice
             end
-            Mf = cn.rho_ice * ebm.Dzsoil[k] * sthf
-            Mu = cn.rho_wat * ebm.Dzsoil[k] * sthu
-            ebm.csoil[k] = ebm.hcap_soil * ebm.Dzsoil[k] + cn.hcap_ice * Mf + cn.hcap_wat * Mu + cn.rho_wat * ebm.Dzsoil[k] * ((cn.hcap_wat - cn.hcap_ice) * Tc + cn.Lf) * dthudT
-            Smf = cn.rho_ice * sthf / (cn.rho_wat * ebm.Vsat)
+            Mf = rho_ice * ebm.Dzsoil[k] * sthf
+            Mu = rho_wat * ebm.Dzsoil[k] * sthu
+            ebm.csoil[k] = ebm.hcap_soil * ebm.Dzsoil[k] + hcap_ice * Mf + hcap_wat * Mu + rho_wat * ebm.Dzsoil[k] * ((hcap_wat - hcap_ice) * Tc + Lf) * dthudT
+            Smf = rho_ice * sthf / (rho_wat * ebm.Vsat)
             Smu = sthu / ebm.Vsat
             thice = 0.0
             if (Smf > 0.0)
@@ -84,7 +84,7 @@ function surf_props(ebm::EBM, cn::Constants, Sf)
             if (Smu > 0.0)
                 thwat = ebm.Vsat * Smu / (Smu + Smf)
             end
-            hcon_sat = ebm.hcon_soil * (cn.hcon_wat^thwat) * (cn.hcon_ice^thice) / (cn.hcon_air^ebm.Vsat)
+            hcon_sat = ebm.hcon_soil * (hcon_wat^thwat) * (hcon_ice^thice) / (hcon_air^ebm.Vsat)
             ebm.ksoil[k] = (hcon_sat - ebm.hcon_soil) * (Smf + Smu) + ebm.hcon_soil
             if (k == 1)
                 ebm.gs = ebm.gsat * max((Smu * ebm.Vsat / ebm.Vcrit)^2.0, 1.0)

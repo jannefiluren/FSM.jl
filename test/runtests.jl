@@ -40,15 +40,13 @@ input = Input{Float64}(
             Tsoil=[282.98, 284.17, 284.70, 284.70]
         )
 
-        cn = Constants{Float64}()
-
         snowdepth = similar(input.Ta)
         SWE = similar(input.Ta)
         Tsurf = similar(input.Ta)
 
         # Run model
 
-        run!(ebm, cn, snowdepth, SWE, Tsurf, input)
+        run!(ebm, snowdepth, SWE, Tsurf, input)
 
         # Read reference data
 

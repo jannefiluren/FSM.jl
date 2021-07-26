@@ -1,7 +1,5 @@
 using FSM
 
-cn = Constants{Float64}()
-
 ebm = EBM{Float64}(
     am=1,
     cm=1,
@@ -17,17 +15,17 @@ SW = 100.0
 LW = 100.0
 RH = 100.0
 
-Qs = qsat(true, Ps, Ta, cn)
+Qs = qsat(true, Ps, Ta)
 Qa = (RH / 100.0) * Qs
 
-surf_props(ebm, cn, Sf)
-surf_exch(ebm, cn, Ta, Ua)
+surf_props(ebm, Sf)
+surf_exch(ebm, Ta, Ua)
 
-surf_ebal(ebm, cn, Ta, Qa, Ua, Ps, SW, LW)
+surf_ebal(ebm, Ta, Qa, Ua, Ps, SW, LW)
 
-@code_warntype surf_ebal(ebm, cn, Ta, Qa, Ua, Ps, SW, LW)
+@code_warntype surf_ebal(ebm, Ta, Qa, Ua, Ps, SW, LW)
 
-time_surf_ebal(ebm, cn, Ta, Qa, Ua, Ps, SW, LW) = @time surf_ebal(ebm, cn, Ta, Qa, Ua, Ps, SW, LW)
+time_surf_ebal(ebm, Ta, Qa, Ua, Ps, SW, LW) = @time surf_ebal(ebm, Ta, Qa, Ua, Ps, SW, LW)
 
-time_surf_ebal(ebm, cn, Ta, Qa, Ua, Ps, SW, LW)
-time_surf_ebal(ebm, cn, Ta, Qa, Ua, Ps, SW, LW)
+time_surf_ebal(ebm, Ta, Qa, Ua, Ps, SW, LW)
+time_surf_ebal(ebm, Ta, Qa, Ua, Ps, SW, LW)

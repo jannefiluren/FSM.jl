@@ -1,7 +1,5 @@
 using FSM
 
-cn = Constants{Float64}()
-
 ebm = EBM{Float64}(
     am=1,
     cm=1,
@@ -19,20 +17,20 @@ RH = 100.0
 Rf = 0.0
 Sf = 10.0
 
-Qs = qsat(true, Ps, Ta, cn)
+Qs = qsat(true, Ps, Ta)
 Qa = (RH / 100.0) * Qs
 
 D = Vector{Float64}(undef, ebm.Nsmax)
 S = Vector{Float64}(undef, ebm.Nsmax)
 W = Vector{Float64}(undef, ebm.Nsmax)
 
-surf_props(ebm, cn, Sf)
-surf_exch(ebm, cn, Ta, Ua)
-surf_ebal(ebm, cn, Ta, Qa, Ua, Ps, SW, LW)
+surf_props(ebm, Sf)
+surf_exch(ebm, Ta, Ua)
+surf_ebal(ebm, Ta, Qa, Ua, Ps, SW, LW)
 
-@code_warntype snow(ebm, cn, Sf, Rf, Ta, D, S, W)
+@code_warntype snow(ebm, Sf, Rf, Ta, D, S, W)
 
-time_snow(ebm, cn, Sf, Rf, Ta, D, S, W) = @time snow(ebm, cn, Sf, Rf, Ta, D, S, W)
+time_snow(ebm, Sf, Rf, Ta, D, S, W) = @time snow(ebm, Sf, Rf, Ta, D, S, W)
 
-time_snow(ebm, cn, Sf, Rf, Ta, D, S, W)
-time_snow(ebm, cn, Sf, Rf, Ta, D, S, W)
+time_snow(ebm, Sf, Rf, Ta, D, S, W)
+time_snow(ebm, Sf, Rf, Ta, D, S, W)

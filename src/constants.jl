@@ -1,7 +1,7 @@
 # Physical constants
 
 const cp = 1005          # Specific heat capacity of dry air (J/K/kg)
-const epsm = 0.622       # Ratio of molecular weights of water and dry air    BEFORE eps
+const epsm = 0.622       # Ratio of molecular weights of water and dry air (eps in fortran code)
 const e0 = 611.213       # Saturation vapour pressure at Tm (Pa)
 const g = 9.81           # Acceleration due to gravity (m/s^2)
 const hcap_ice = 2100.   # Specific heat capacity of ice (J/K/kg)

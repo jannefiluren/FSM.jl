@@ -15,7 +15,7 @@ include("surf_ebal.jl")
 include("snow.jl")
 include("soil.jl")
 
-export EBM, Input, Constants, run!
+export EBM, Input, run!
 
 export qsat, surf_props, surf_exch, surf_ebal, snow, soil
 

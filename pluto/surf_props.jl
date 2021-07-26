@@ -45,10 +45,10 @@ md"""
 function compute_albedo(ebm::EBM, cn::Constants, Sf)
 
 	if ebm.am == 0  # Diagnosed snow albedo
-		ebm.albs = ebm.asmn + (ebm.asmx - ebm.asmn) * (ebm.Tsurf - cn.Tm) / ebm.Talb
+		ebm.albs = ebm.asmn + (ebm.asmx - ebm.asmn) * (ebm.Tsurf - Tm) / ebm.Talb
 	elseif ebm.am == 1  # Prognostic snow albedo
 		tau = 3600 * ebm.tcld
-		if (ebm.Tsurf >= cn.Tm)
+		if (ebm.Tsurf >= Tm)
 			tau = 3600 * ebm.tmlt
 		end
 		rt = 1 / tau + Sf / ebm.Salb
@@ -67,13 +67,13 @@ function compute_albedo(ebm::EBM, cn::Constants, Sf)
 end
 
 # ╔═╡ 0b59e04c-4aaf-11eb-33ff-f9e05476a28f
-begin
-	Tsurf = cn.Tm-10:0.01:cn.Tm+10
+    begin
+	Tsurf = Tm - 10:0.01:Tm + 10
 	Sf = 0
-	
+
 	albedo = []
 	for T in Tsurf
-		eb = EBM{Float64}(Tsurf = T, am = 0)
+		eb = EBM{Float64}(Tsurf=T, am=0)
 		compute_albedo(eb, cn, Sf)
 		push!(albedo, eb.albs)
 	end
@@ -85,7 +85,7 @@ md"""
 """
 
 # ╔═╡ be13ab46-4aaf-11eb-1f96-752bcbef74f6
-plot(Tsurf, albedo, xlabel = "Temperature (K)", ylabel = "Albedo (-)", title = "Albedo model = 0")
+plot(Tsurf, albedo, xlabel="Temperature (K)", ylabel="Albedo (-)", title="Albedo model = 0")
 
 # ╔═╡ 1427ffea-4ab1-11eb-1862-254bcabf97ac
 md"""
@@ -102,20 +102,20 @@ Add snow at hour = 100
 
 # ╔═╡ 20190330-4ab1-11eb-33b4-e9ccd85a469a
 begin
-	eb_cold = EBM{Float64}(Tsurf = 271.15, am = 1)
-	eb_warm = EBM{Float64}(Tsurf = 273.15, am = 1)
-	albs_cold = [eb_cold.albs]
+	eb_cold = EBM{Float64}(Tsurf=271.15, am=1)
+	eb_warm = EBM{Float64}(Tsurf=273.15, am=1)
+        	albs_cold = [eb_cold.albs]
 	albs_warm = [eb_warm.albs]
 	t_prog = [0]
-	for t in 1:24*10
-		
+	for t in 1:24 * 10
+
 		if t == 100
-			Sf = Sf_one/3600
+			Sf = Sf_one / 3600
 		else
 			Sf = 0
 		end
-			
-		
+
+        
 		compute_albedo(eb_cold, cn, Sf)
 		compute_albedo(eb_warm, cn, Sf)
 		push!(albs_cold, eb_cold.albs)
@@ -128,8 +128,8 @@ end
 begin
 	plot(t_prog, albs_cold)
 	plot!(t_prog, albs_warm)
-	plot!(xlabel = "Temperature (K)", ylabel = "Albedo (-)", title = "Albedo model = 1")
-	plot!(ylim = (0, 1))
+	plot!(xlabel="Temperature (K)", ylabel="Albedo (-)", title="Albedo model = 1")
+	plot!(ylim=(0, 1))
 end
 
 # ╔═╡ Cell order:
