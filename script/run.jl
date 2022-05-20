@@ -3,9 +3,11 @@ using CSV
 using DataFrames
 using Plots
 
-data_force = CSV.File("data/met_CdP_0506.csv") |> DataFrame
+fsm_path = dirname(pathof(FSM))
 
-data_ref = CSV.File("fortran/output/out_CdP_0506_11111.txt", header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
+data_force = CSV.File(joinpath(fsm_path, "..", "data", "met_CdP_0506.csv")) |> DataFrame
+
+data_ref = CSV.File(joinpath(fsm_path, "..", "fortran", "output", "out_CdP_0506_11111.txt"), header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
 
 input = Input{Float64}(
     data_force.year,
