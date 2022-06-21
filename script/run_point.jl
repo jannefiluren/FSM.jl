@@ -137,7 +137,7 @@ end
 @showprogress "Plotting result..." for i in range(1, nstat)
 
     plot(snowdepth[:, i])
-    savefig("D:/FSMJL/station_" * string(i) * ".png")
+    savefig("D:/FSMJL/point/station_" * string(i) * ".png")
 
 end
 
