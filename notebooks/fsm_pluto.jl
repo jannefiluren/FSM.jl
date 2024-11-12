@@ -1,28 +1,24 @@
 ### A Pluto.jl notebook ###
-# v0.20.3
+# v0.19.46
 
 using Markdown
 using InteractiveUtils
 
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
-    #! format: off
     quote
         local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
         global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
     end
-    #! format: on
 end
 
 # ╔═╡ fc72c7b0-d9c8-11ec-1e41-07be1f03aeb5
 begin
     import Pkg
-    # activate the shared project environment
-    Pkg.activate("/home/jannefiluren/.julia/dev/FSM")
-    # instantiate, i.e. make sure that all packages are downloaded
-    # Pkg.instantiate()
+    Pkg.activate(joinpath(@__DIR__,".."))
+    Pkg.instantiate()
 
 	using FSM
 	using CSV
@@ -43,10 +39,10 @@ Snow conductivity model: $(@bind cm_tmp Select([0,1])) \
 Snow density model: $(@bind dm_tmp Select([0,1])) \
 Surface exchange model: $(@bind em_tmp Select([0,1])) \
 Snow hydraulics model: $(@bind hm_tmp Select([0,1])) \
-Longwave offset: $(@bind LW_offset NumberField(-20:2:20; default=0)) \
-Short wave offset: $(@bind SW_offset NumberField(0.5:0.1:1.5; default=1)) \
-Air temperature offset: $(@bind Ta_offset NumberField(-3:0.5:3; default=0)) \
-Wind speed offset: $(@bind Ua_offset NumberField(0.2:0.1:2; default=1.0))\
+Longwave offset (add): $(@bind LW_offset NumberField(-20:2:20; default=0)) \
+Short wave offset (multiply): $(@bind SW_offset NumberField(0.5:0.1:1.5; default=1)) \
+Air temperature offset (add): $(@bind Ta_offset NumberField(-3:0.5:3; default=0)) \
+Wind speed offset (multiply): $(@bind Ua_offset NumberField(0.2:0.1:2; default=1.0))\
 """
 
 # ╔═╡ 4be3cfe4-810c-4f2b-84e6-57fa6f65329c
