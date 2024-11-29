@@ -1,17 +1,19 @@
 ### A Pluto.jl notebook ###
-# v0.19.46
+# v0.20.3
 
 using Markdown
 using InteractiveUtils
 
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
+    #! format: off
     quote
         local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
         global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
     end
+    #! format: on
 end
 
 # ╔═╡ fc72c7b0-d9c8-11ec-1e41-07be1f03aeb5
@@ -23,8 +25,9 @@ begin
 	using FSM
 	using CSV
 	using DataFrames
-	using Plots
-	using PlutoUI	
+	using PlutoUI
+	using Dates
+	using CairoMakie
 end
 
 # ╔═╡ 9bfc0a63-02a7-4e0a-8af9-5aaf13a86aa6
@@ -42,7 +45,7 @@ Snow hydraulics model: $(@bind hm_tmp Select([0,1])) \
 Longwave offset (add): $(@bind LW_offset NumberField(-20:2:20; default=0)) \
 Short wave offset (multiply): $(@bind SW_offset NumberField(0.5:0.1:1.5; default=1)) \
 Air temperature offset (add): $(@bind Ta_offset NumberField(-3:0.5:3; default=0)) \
-Wind speed offset (multiply): $(@bind Ua_offset NumberField(0.2:0.1:2; default=1.0))\
+Wind speed offset (multiply): $(@bind Ua_offset NumberField(0.0:0.2:5; default=1.0))\
 """
 
 # ╔═╡ 4be3cfe4-810c-4f2b-84e6-57fa6f65329c
@@ -50,9 +53,23 @@ md"""
 ## Results...
 """
 
+# ╔═╡ 0b1516f2-041a-4358-9e30-5d3dcb24db1e
+# ╠═╡ disabled = true
+#=╠═╡
+begin
+	plot(swe_ref, ylabel="Snow water equivalent (mm)", linewidth=2, label="Ref")
+	#plot!(swe_exp, label="Exp")
+	#plot!(swe_base, label="Base")
+end
+  ╠═╡ =#
+
 # ╔═╡ 5ebbb041-d1ad-495f-a1d8-821dbf9904d0
 begin
 
+	# Setup
+
+	fsm_path = dirname(pathof(FSM))
+	
 	# Get physics options
 
 	am = string(am_tmp)
@@ -63,24 +80,29 @@ begin
 
 	# Load forcing data
 
-	fsm_path = dirname(pathof(FSM))
+	file_input = joinpath(fsm_path, "..", "data", "met_CdP_0506.csv") 
 
-	data_force = CSV.File(joinpath(fsm_path, "..", "data", "met_CdP_0506.csv")) |> DataFrame
+	df_input = CSV.File(file_input) |> DataFrame
+
+	df_input.time = DateTime.(
+		df_input.year,
+		df_input.month,
+		df_input.day,
+		df_input.hour)
 
 	input = Input{Float64}(
-		data_force.year,
-		data_force.month,
-		data_force.day,
-		data_force.hour,
-		data_force.SW .* SW_offset,
-		data_force.LW .+ LW_offset,
-		data_force.Sf,
-		data_force.Rf,
-		data_force.Ta .+ Ta_offset,
-		data_force.RH,
-		data_force.Ua .* Ua_offset,
-		data_force.Ps,
-		)
+		df_input.year,
+		df_input.month,
+		df_input.day,
+		df_input.hour,
+		df_input.SW .* SW_offset,
+		df_input.LW .+ LW_offset,
+		df_input.Sf,
+		df_input.Rf,
+		df_input.Ta .+ Ta_offset,
+		df_input.RH,
+		df_input.Ua .* Ua_offset,
+		df_input.Ps)
 
 	# Initilize model for experiments
 
@@ -97,38 +119,27 @@ begin
 
 	cn = Constants{Float64}()
 
-	hs_exp = similar(input.Ta)
-	swe_exp = similar(input.Ta)
-	tsurf_exp = similar(input.Ta)
+	df_output = DataFrame(
+		time=df_input.time,
+		hs_exp=similar(input.Ta),
+		swe_exp=similar(input.Ta),
+		tsurf_exp=similar(input.Ta))
 
-	run!(ebm, cn, hs_exp, swe_exp, tsurf_exp, input)
+	timing = @elapsed run!(ebm, cn, df_output.hs_exp, df_output.swe_exp, df_output.tsurf_exp, input)
 
-	hs_base = similar(input.Ta)
-	swe_base = similar(input.Ta)
-	tsurf_base = similar(input.Ta)
+	# Load observations
 
-	ebm = EBM{Float64}(
-		am=0,
-		cm=0,
-		dm=0,
-		em=0,
-		hm=0,
-		zT=1.5,
-		zvar=false,
-		Tsoil=[282.98, 284.17, 284.70, 284.70]
-	)
-
-	timing = @elapsed run!(ebm, cn, hs_base, swe_base, tsurf_base, input)
-
-	# Load reference simulations from fortran code
-
-	file_ref = "out_CdP_0506_$(am)$(cm)$(dm)$(em)$(hm).txt"
-
-	data_ref = CSV.File(joinpath(fsm_path, "..", "test", "data", file_ref), header=["year", "month", "day", "hour", "alb", "Roff", "snowdepth", "SWE", "Tsurf", "Tsoil"], delim=" ", ignorerepeated=true) |> DataFrame
-
-	hs_ref = data_ref.snowdepth
-	swe_ref = data_ref.SWE
-	tsurf_ref = data_ref.Tsurf
+	file_obs = joinpath(fsm_path, "..", "data", "obs_CdP_0506.txt")
+	header = ["year","month","day","alb","rof","hs","swe","tsf","tsl"]
+	
+	df_obs = CSV.File(
+		file_obs,
+		header=header,
+		delim=" ",
+		ignorerepeated=true) |> DataFrame
+	
+	df_obs.time = DateTime.(df_obs.year, df_obs.month, df_obs.day)
+	df_obs = ifelse.(df_obs .== -99, missing, df_obs)
 
 	nothing
 
@@ -139,23 +150,15 @@ md"""Model run time: $(timing) seconds"""
 
 # ╔═╡ 41c73e0c-d179-49a3-9d71-3ccaa664fb77
 begin
-	plot(hs_ref, ylabel="Snow depth (m)", linewidth=2, label="Ref")
-	plot!(hs_exp, label="Exp")
-	plot!(hs_base, label="Base")
-end
-
-# ╔═╡ 0b1516f2-041a-4358-9e30-5d3dcb24db1e
-begin
-	plot(swe_ref, ylabel="Snow water equivalent (mm)", linewidth=2, label="Ref")
-	plot!(swe_exp, label="Exp")
-	plot!(swe_base, label="Base")
-end
-
-# ╔═╡ ff129b48-7221-4803-8766-45acc210d512
-begin
-		plot(tsurf_ref .+ 273.15, ylabel="Surface temperature (K)", linewidth=2, label="Ref")
-		plot!(tsurf_exp, label="Exp")
-		plot!(tsurf_base, label="Base")
+	f = Figure()
+	ax = Axis(f[1, 1],
+		title = "Col de Porte",
+    	ylabel = "Snow depth (m)",
+	)
+	lines!(ax,df_obs.time, df_obs.hs, label = "Observation")
+	lines!(ax,df_output.time, df_output.hs_exp, label = "Simulation")
+	axislegend(position = :rt)
+	f
 end
 
 # ╔═╡ Cell order:
@@ -165,6 +168,5 @@ end
 # ╟─4be3cfe4-810c-4f2b-84e6-57fa6f65329c
 # ╟─41c73e0c-d179-49a3-9d71-3ccaa664fb77
 # ╟─0b1516f2-041a-4358-9e30-5d3dcb24db1e
-# ╟─ff129b48-7221-4803-8766-45acc210d512
 # ╟─5ebbb041-d1ad-495f-a1d8-821dbf9904d0
 # ╟─fc72c7b0-d9c8-11ec-1e41-07be1f03aeb5
