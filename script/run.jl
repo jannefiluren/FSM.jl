@@ -1,7 +1,7 @@
 using FSM
 using CSV
 using DataFrames
-using Plots
+using CairoMakie
 
 fsm_path = dirname(pathof(FSM))
 
@@ -43,5 +43,5 @@ Tsurf = similar(input.Ta)
 
 run!(ebm, cn, snowdepth, SWE, Tsurf, input)
 
-plot(data_ref.SWE - SWE)
-plot(data_ref.Tsurf - Tsurf .+ 273.15)
+lines(data_ref.SWE - SWE)
+lines(data_ref.Tsurf - Tsurf .+ 273.15)
