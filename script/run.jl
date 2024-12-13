@@ -43,5 +43,4 @@ Tsurf = similar(input.Ta)
 
 run!(ebm, cn, snowdepth, SWE, Tsurf, input)
 
-lines(data_ref.SWE - SWE)
-lines(data_ref.Tsurf - Tsurf .+ 273.15)
+plot(snowdepth)

@@ -42,8 +42,9 @@ Snow conductivity model: $(@bind cm_tmp Select([0,1])) \
 Snow density model: $(@bind dm_tmp Select([0,1])) \
 Surface exchange model: $(@bind em_tmp Select([0,1])) \
 Snow hydraulics model: $(@bind hm_tmp Select([0,1])) \
-Longwave offset (add): $(@bind LW_offset NumberField(-20:2:20; default=0)) \
 Short wave offset (multiply): $(@bind SW_offset NumberField(0.5:0.1:1.5; default=1)) \
+Longwave offset (add): $(@bind LW_offset NumberField(-20:2:20; default=0)) \
+Snowfall offset (multiply): $(@bind Sf_offset NumberField(0.2:0.2:5; default=1.0)) \
 Air temperature offset (add): $(@bind Ta_offset NumberField(-3:0.5:3; default=0)) \
 Wind speed offset (multiply): $(@bind Ua_offset NumberField(0.0:0.2:5; default=1.0))\
 """
@@ -97,7 +98,7 @@ begin
 		df_input.hour,
 		df_input.SW .* SW_offset,
 		df_input.LW .+ LW_offset,
-		df_input.Sf,
+		df_input.Sf .* Sf_offset,
 		df_input.Rf,
 		df_input.Ta .+ Ta_offset,
 		df_input.RH,
